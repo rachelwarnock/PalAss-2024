@@ -158,7 +158,7 @@ knitr::include_graphics("beauti-09.png")
 To create the input file for BEAST2 we need to export the `xml` file.
 Simply go to File > Save As and navigate to where you want to save the file on your computer.
 
-Don't close BEAUti just yet. If you have time, you can come back and set up more analyses using the molecular data. 
+Close BEAUti for now. If you have time, you can come back and set up more analyses using the molecular data. 
 
 ## Running BEAST2
 
@@ -199,49 +199,14 @@ knitr::include_graphics("mcc_bears_fbd_beast.png")
 
 ## Next tasks {#next}
 
-Some extra things to try. **Make sure you rename the output files so you don't overwrite the files you generated above!**
+Try adding the molecular sequence alignment that complements this dataset.
+This is an alignment with 1000 sites of the mitochondrial gene cytochrome oxidase B for 10 living species. 
 
-### Add molecular sequence data
-
-Try adding the molecular sequence alignment that complements this dataset. You can download this from [here](data/bears_cytb_beast.nex). 
-This is an alignment of the mitochondrial gene cytochrome oxidase B for 10 living species and has 1000 sites. 
-
-Return to the Partitions panel in BEAUti. Drag and drop your new nexus files in here. Select `Import Alignment` when the box appears. 
-
-We have to do some extra check in the partitions panel. We want to apply different substitution models and clock models to the each dataset but we'd like both partitions to share the same underlying tree, so click on the `Tree` fields and make sure these share the same name, e.g., `bears_tree`.
-
-```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
-knitr::include_graphics("beauti-10.png")
-```
-
-Next go to the Tips Dates panel. You shouldn't need to change anything here because all taxa are represented in our morphological matrix that we previously used to define to configure the tips ages. 
-
-### The site model
-
-Head over to the Site Model panel.
-When you have multiple unlinked partitions they will appear along the left.
-Select your molecular partition and let's set up the GTR+G model.
-We will estimate the substitution model, the site frequencies, and the shape parameter ($\alpha$) for the Gamma sites model. 
-
-```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
-knitr::include_graphics("beauti-11.png")
-```
-
-### The Clock model
-
-Next head over to the Clock Model panel.
-Let's set up a relaxed clock for the molecular data. Simply select Relaxed Clock Log Normal from the menu. 
-
-```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
-knitr::include_graphics("beauti-12.png")
-```
-
-### Priors
-
-
-### MCMC settings
-
-That's it! 
+There's a bug in the latest version of BEAUti that makes it tricky to set up different partitions, so we're going to use a precooked xml for this purpose. You can download this [here](bears_morpho_cytb.xml) and get it running in BEAST.
 
 > What differences do you notice in your output?
+
+
+
+
 

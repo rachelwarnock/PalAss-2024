@@ -463,8 +463,8 @@ the default <code>$(tree)</code>.</p>
 <p>To create the input file for BEAST2 we need to export the
 <code>xml</code> file. Simply go to File &gt; Save As and navigate to
 where you want to save the file on your computer.</p>
-<p>Don’t close BEAUti just yet. If you have time, you can come back and
-set up more analyses using the molecular data.</p>
+<p>Close BEAUti for now. If you have time, you can come back and set up
+more analyses using the molecular data.</p>
 </div>
 <div id="running-beast2" class="section level2">
 <h2>Running BEAST2</h2>
@@ -512,54 +512,16 @@ notice any a bit odd?</p>
 </div>
 <div id="next" class="section level2">
 <h2>Next tasks</h2>
-<p>Some extra things to try. <strong>Make sure you rename the output
-files so you don’t overwrite the files you generated above!</strong></p>
-<div id="add-molecular-sequence-data" class="section level3">
-<h3>Add molecular sequence data</h3>
 <p>Try adding the molecular sequence alignment that complements this
-dataset. You can download this from <a
-href="data/bears_cytb_beast.nex">here</a>. This is an alignment of the
-mitochondrial gene cytochrome oxidase B for 10 living species and has
-1000 sites.</p>
-<p>Return to the Partitions panel in BEAUti. Drag and drop your new
-nexus files in here. Select <code>Import Alignment</code> when the box
-appears.</p>
-<p>We have to do some extra check in the partitions panel. We want to
-apply different substitution models and clock models to the each dataset
-but we’d like both partitions to share the same underlying tree, so
-click on the <code>Tree</code> fields and make sure these share the same
-name, e.g., <code>bears_tree</code>.</p>
-<p><img src="beauti-10.png" width="80%" style="padding:10px" /></p>
-<p>Next go to the Tips Dates panel. You shouldn’t need to change
-anything here because all taxa are represented in our morphological
-matrix that we previously used to define to configure the tips ages.</p>
-</div>
-<div id="the-site-model-1" class="section level3">
-<h3>The site model</h3>
-<p>Head over to the Site Model panel. When you have multiple unlinked
-partitions they will appear along the left. Select your molecular
-partition and let’s set up the GTR+G model. We will estimate the
-substitution model, the site frequencies, and the shape parameter (<span
-class="math inline">\(\alpha\)</span>) for the Gamma sites model.</p>
-<p><img src="beauti-11.png" width="80%" style="padding:10px" /></p>
-</div>
-<div id="the-clock-model" class="section level3">
-<h3>The Clock model</h3>
-<p>Next head over to the Clock Model panel. Let’s set up a relaxed clock
-for the molecular data. Simply select Relaxed Clock Log Normal from the
-menu.</p>
-<p><img src="beauti-12.png" width="80%" style="padding:10px" /></p>
-</div>
-<div id="priors-1" class="section level3">
-<h3>Priors</h3>
-</div>
-<div id="mcmc-settings-1" class="section level3">
-<h3>MCMC settings</h3>
-<p>That’s it!</p>
+dataset. This is an alignment with 1000 sites of the mitochondrial gene
+cytochrome oxidase B for 10 living species.</p>
+<p>There’s a bug in the latest version of BEAUti that makes it tricky to
+set up different partitions, so we’re going to use a precooked xml for
+this purpose. You can download this <a
+href="bears_morpho_cytb.xml">here</a> and get it running in BEAST.</p>
 <blockquote>
 <p>What differences do you notice in your output?</p>
 </blockquote>
-</div>
 </div>
 </div>
 
