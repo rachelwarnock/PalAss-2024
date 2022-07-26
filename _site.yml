@@ -1,0 +1,17 @@
+name: "CoME exercises"
+output_dir: '.'
+# let's you build your sites navigation
+output:
+  #prettydoc::html_pretty:
+  html_document:
+    theme: paper # other nice themes: cosmo, simplex, paper, spacelab, lumen, yeti
+    lib_dir: site_libs
+    self_contained: no
+navbar:
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "RevBayes exercise"
+      href: exercise-01.html
+    - text: "BEAST2 exercise"
+      href: exercise-02.html
