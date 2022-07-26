@@ -387,11 +387,8 @@ models.</p>
 <code>Fossilised Birth Death Model</code> from the drop down menu
 (you’ll find this at the top of this list). You’ll notice that this adds
 a bunch of extra parameters to the list.</p>
-<p>First let’s concentrate on the options under the first toggle. In the
-Origin box put 40 - this is the starting value of this parameter and
-must lie within the bounds of the prior, which we’ll specify in just a
-moment.</p>
-<p>We’ll leave all the other options as they are. Under this set up,
+<p>First let’s concentrate on the options under the first toggle. We’ll
+leave all the default options as they are right now. Under this set up,
 we’re parametrising the model using the diversification, turnover and
 sampling proportion option. We’re also fixing Rho. You can leave this as
 1.0, since we sample all living bears.</p>
@@ -402,15 +399,12 @@ order. Remember that it’s bad practice to stick with the default priors,
 unless you have good reason to.</p>
 <p>First let’s deal with the prior on the shape parameter used for the
 shape parameter in the Gamma sites model. For this we’ll use an
-exponential distribution with <span
-class="math inline">\(\delta\)</span> = 1, which has a mean of <span
-class="math inline">\(1/\delta\)</span> = 1.</p>
+exponential distribution with a mean of = 1.</p>
 <p><img src="beauti-04.png" width="80%" style="padding:10px" /></p>
 <p>Select the clock rate. The default prior on this is a uniform
 distribution between 0 and infinity - this is obviously not a good prior
-for this parameter! Let’s use an exponential prior with <span
-class="math inline">\(\delta\)</span> = 10 and a mean of <span
-class="math inline">\(1/\delta\)</span> = 0.1.</p>
+for this parameter! Let’s use an exponential prior with a mean of
+0.1.</p>
 <p><img src="beauti-05.png" width="80%" style="padding:10px" /></p>
 <p>Next we’ll define all the priors of the FBD model parameters,
 starting with the diversification rate. Let’s use a gamma prior for this
@@ -427,7 +421,10 @@ they are.</p>
 <p><img src="beauti-07.png" width="80%" style="padding:10px" /></p>
 <p>Now we’ll specify a prior on the origin time parameter. We’ll use the
 oldest bear fossil as a minimum (= 35.0) and a recent estimate for the
-age of carnivores as a maximum (= 55.0).</p>
+age of carnivores as a maximum (= 55.0). We also need to ensure the
+starting value for the origin is within the bounds. This is currently
+set to 100. Change it to something like 40, so it doesn’t violate the
+bounds.</p>
 <p><img src="beauti-07.png" width="80%" style="padding:10px" /></p>
 <p>Finally, we’ll create a clade constraint to monitor the age of all
 living bears. Click <code>+ Add Prior</code> and select MRCA (= most

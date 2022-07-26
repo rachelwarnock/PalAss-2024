@@ -70,8 +70,8 @@
 <map name="OneOnX" >beast.math.distributions.OneOnX</map>
 
 
-<run id="mcmc" spec="MCMC" chainLength="20000000">
-    <state id="state" storeEvery="2000">
+<run id="mcmc" spec="MCMC" chainLength="10000000">
+    <state id="state" storeEvery="1000">
         <tree id="Tree.t:bearsTree" name="stateNode">
             <trait id="dateTrait.t:bearsTree" spec="beast.evolution.tree.TraitSet" traitname="date-backward">
                 
@@ -208,8 +208,8 @@ Arctodus_simus_0.5=0.5
                     <parameter id="RealParameter.019" estimate="false" name="mean">0.3337</parameter>
                 </Exponential>
             </prior>
-            <distribution id="living_bears.prior" spec="beast.math.distributions.MRCAPrior" monophyletic="true" tree="@Tree.t:bearsTree">
-                <taxonset id="living_bears" spec="TaxonSet">
+            <distribution id="1_CrownBears.prior" spec="beast.math.distributions.MRCAPrior" monophyletic="true" tree="@Tree.t:bearsTree">
+                <taxonset id="1_CrownBears" spec="TaxonSet">
                     <taxon id="Agriarctos_spp_5.0" spec="Taxon"/>
                     <taxon id="Ailurarctos_lufengensis_7.7" spec="Taxon"/>
                     <taxon id="Ailuropoda_melanoleuca_0" spec="Taxon"/>
