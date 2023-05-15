@@ -11,15 +11,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Bayesian tree inference using the fossilised birth-death process in BEAST2
 
+#### Contents
+* [Read the data](#read)
+* [Tip dates](#tips)
+* [The site model](#site)
+* [Clock model](#clock)
+* [Priors](#prior)
+* [MCMC settings](#mcmc)
+* [Evaluating the output](#output)
+* [Next tasks](#next)
+
 In this exercise we'll estimate a time tree of bears under the fossilised birth-death (FBD) process. We'll use a [morphological matrix](data/bears_morphology_beast.nex) that comprises 62 binary characters for 18 living and fossil bears. We'll also use age information associated with our taxa, which is also included in this file. Download these files and examine the contents. The exercise is adapted from [this tutorial](https://taming-the-beast.org/tutorials/FBD-tutorial/) written by Tracy Heath. The original contains lots of useful background information.
 
 For this exercise create a folder called `FBD_exercise_BEAST2` (or whatever you want). 
 
+#### Software
+
+Download the software [BEAST2 v2.6 or above](https://www.beast2.org), [Tracer v1.7](https://beast.community/tracer) and [FigTree](https://beast.community/figtree) if you haven't done so already.
+
 BEAST2 uses an `xml` file as input, containing all the model specifications, including prior parameters and MCMC settings. You can create the `xml` file using the BEAST2 accessory program BEAUti.
 
-## Packages
+#### Packages
 
-BEAST2 is similar to RevBayes in providing  flexible and modular options for analysing phylogenetic data in a Bayesian framework. One practical difference is the package structure used by BEAST2. There is a suite of models in the core BEAST2 program, but there are many other models available via packages that you can install using  BEAUti.
+BEAST2 is similar to RevBayes in providing  flexible and modular options for analysing phylogenetic data in a Bayesian framework. One practical difference is the package structure used by BEAST2. There is a suite of models in the core BEAST2 program, but there are many other models available via packages that you can install also using BEAUti.
 
 For the analysis in this tutorial we need to install the `SA` and `MM` packages, both developed by Sasha Gavryushkina. 
 
@@ -27,9 +41,9 @@ Open BEAUTi go to File > Manage Packages, scroll down, select the `SA` and `MM` 
 
 Restart BEAUTi and we can begin setting up the analysis.
 
-## Reading the data
+## Reading the data {#read}
 
-To read in your data, simply drag your nexus file into the partitions panel. Or go to File > Import Alignment and navigate to your nexus file.
+To read in your data, simply drag your nexus file into the Partitions panel. Or go to File > Import Alignment and navigate to your nexus file.
 
 This will bring up a box that asks you to clarify what type of data you have. Select Add Morphological Data. 
 
@@ -42,11 +56,11 @@ If you successfully imported the data, your window should look like this.
 knitr::include_graphics("beauti-01.png")
 ```
 
-## Tip dates
+## Tip dates {#tips}
 
 Move on to the Tip Dates panel and select `Use tip dates`. You might have noticed that the names in the nexus file are appended by a number. This is the age information associated with each species. BEAUti can parse this information.
 
-Select auto-configure and then `use everything` > after last `_`. Back in the main window also make sure to select `Before the present` from the drop down menu. `Since some time in the past` is used more commonly for viruses or bacteria. 
+Select Auto-configure and then `use everything` > after last `_`. Back in the main window also make sure to select `Before the present` from the drop down menu. `Since some time in the past` is used more commonly for viruses or bacteria. 
 
 ## The tripartite model
 
@@ -54,11 +68,11 @@ Recall that for divergence time estimation we need three model components (the s
 
   1. The Site Model panel is for the substitution model
   2. The Clock Model panel is for the clock model
-  3. The Priors panel is for the time tree model **and** all the other priors
+  3. The Priors panel is for the time tree model *plus* all other priors
 
 Important note: there are many more options than the ones you'll see going through the panels in this tutorial. More options are available via other packages or you can directly edit the xml. 
 
-## The site model
+## The site model {#site}
 
 Head towards the Site Model panel. Because we're working with discrete morphological data, we're only presented with a limited set of options. 
 
@@ -75,7 +89,7 @@ knitr::include_graphics("beauti-02.png")
 
 If you had molecular data or multiple partitions, more options would appear in this panel. 
 
-## Clock model
+## Clock model {#clock}
 
 Move onto the Clock Model panel and simply leave the Strict Clock option in place.
 
@@ -83,7 +97,7 @@ Move onto the Clock Model panel and simply leave the Strict Clock option in plac
 knitr::include_graphics("beauti-02b.png")
 ```
 
-## Priors
+## Priors {#prior}
 
 The Priors panel is where a lot of juicy choices happen. 
 Here you will be presented with the tree model options, along with prior options for all the other parameters associated with the substitution and clock models.
@@ -97,9 +111,9 @@ We'll leave all the default options as they are right now. Under this set up, we
 knitr::include_graphics("beauti-03.png")
 ```
 
-Now we've set up the tree model, let's move onto set up all the other priors. These are presented below the tree model toggle in alphabetical order. Remember that it's bad practice to stick with the default priors, unless you have good reason to.
+Now we've set up the tree model, let's move onto set up all the other priors. These are presented below the tree model toggle in alphabetical order. I'll go through them in the following order: substitution model, clock model, FBD model. Remember that it's bad practice to stick with the default priors, unless you have good reason to.
 
-First let's deal with the prior on the shape parameter used for the shape parameter in the Gamma sites model. For this we'll use an exponential distribution with a mean of = 1.
+First let's deal with the prior on the shape parameter of the Gamma sites model. For this we'll use an exponential distribution with a mean of = 1.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
 knitr::include_graphics("beauti-04.png")
@@ -117,18 +131,18 @@ Next we'll define all the priors of the FBD model parameters, starting with the 
 knitr::include_graphics("beauti-05b.png")
 ```
 
-Then let's specify the sampling proportion and turnover parameters. These both lie between 0 and 1, so the default prior of a uniform distribution between 0 and 1 is a reasonable choice, in the absence of other information about these parameter values. Let's leave these as they are.
+Then let's look at the sampling proportion and turnover parameters. These both lie between 0 and 1, so the default prior of a uniform distribution between 0 and 1 is a reasonable choice, in the absence of other information about these parameter values. We'll leave these as they are.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
 knitr::include_graphics("beauti-07.png")
 ```
 
 Now we'll specify a prior on the origin time parameter. 
-We'll use the oldest bear fossil as a minimum (= 35.0) and a recent estimate for the age of carnivores as a maximum (= 55.0). We also need to ensure the starting value for the origin is within the bounds.
-This is currently set to 100. Change it to something like 40, so it doesn't violate the bounds.
+We'll use the oldest bear fossil as a minimum (= 35.0) and a recent estimate for the age of carnivores as a maximum (= 55.0). We also need to ensure the starting value for the origin is within these bounds.
+This is currently set to 100, in the box that says `initial = [100.0]`. Change it to something like 40, so it doesn't violate fall outside the minimum and maximum values.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
-knitr::include_graphics("beauti-07.png")
+knitr::include_graphics("beauti-07b.png")
 ```
 
 Finally, we'll create a clade constraint to monitor the age of all living bears. Click `+ Add Prior` and select MRCA (= most recent common ancestor) prior. Put the following 8 taxa on the righthand side: *Ailuropoda melanoleuca*, *Tremarctos ornatus*, *Melursus ursinus*, *Ursus arctos*, *Ursus maritimus*, *Helarctos malayanus*, *Ursus americanus*, *Ursus thibetanus*. Give the clade a label, e.g., `living_bears`. 
@@ -137,15 +151,15 @@ Finally, we'll create a clade constraint to monitor the age of all living bears.
 knitr::include_graphics("beauti-08.png")
 ```
 
-Leave the `monophyletic` box unchecked here because we don't want to enforce monophyly of this group, as there might be fossils also belonging to this clade. 
-Note this is how you define nodes for specifying node calibrations in BEAUti. After defining a clade, you can then select a distribution from the drop down menu associated with your node.
+Leave the `monophyletic` box unchecked  because we don't want to enforce the monophyly of this group, as there might be fossils that also belong to this clade. 
+Note this is how you define nodes for specifying node calibrations in BEAUti. After defining a clade, you can then select a distribution from the drop down menu associated with your node. See [this tutorial](https://taming-the-beast.org/tutorials/Introduction-to-BEAST2/) for more details.
 
-## MCMC settings
+## MCMC settings {#mcmc}
 
-Navigate to the MCMC panel to finalise the set up. Our dataset is small, so let's go with `100000` for the Chain Length. 
+Navigate to the MCMC panel to finalise the set up. Our dataset is small, so let's go with `1000000` for the Chain Length. 
 Leave the Store Every and Pre Burnin options as they are.
 
-You can then use the `tracelog` and `treelog` toggles to specify the logging frequency. Let's change the logging frequency for both of these to `100`, so we end up with 10000 posterior samples. 
+You can then use the `tracelog` and `treelog` toggles to specify the logging frequency. Let's change the logging frequency for both of these to `10000`, so we end up with 10000 posterior samples. 
 You can also change the output file names here. The trees file will keep the same prefix as the log file if you don't change the default `$(tree)`.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
@@ -157,11 +171,13 @@ knitr::include_graphics("beauti-09.png")
 To create the input file for BEAST2 we need to export the `xml` file.
 Simply go to File > Save As and navigate to where you want to save the file on your computer.
 
-Close BEAUti for now. If you have time, you can come back and set up more analyses using the molecular data. 
+Leave BEAUti open for now. If you have time, you can come back and set up more analyses using the molecular data. 
 
 ## Running BEAST2
 
-This might take a while run pretty quickly. Meanwhile, you could move on to the [Next tasks](#next).
+Open the program BEAST. This will open a window that gives you the option to select your xml file. Navigate to your xml file and click `Run`!
+
+The analysis might take a while to run. Meanwhile, you could move on to the [Next tasks](#next).
 
 ## Evaluating the output
 
@@ -198,17 +214,22 @@ knitr::include_graphics("mcc_bears_fbd_beast.png")
 
 ## Next tasks {#next}
 
+### Add molecular sequence data
+
 Try adding the molecular sequence alignment that complements this dataset.
 This is an alignment with 1000 sites of the mitochondrial gene cytochrome oxidase B for 10 living species. 
 
-There's a bug in the latest version of BEAUti that makes it tricky to set up different partitions, so we're going to use a precooked xml for this purpose. You can download this [here](bears_morpho_cytb.xml) and get it running in BEAST.
+Note there's a bug in BEAUti v2.6 that makes it tricky to set up different partitions, so you can use a precooked xml for this purpose. You can download this [here](bears_morpho_cytb.xml) and get it running in BEAST.
 
 > What differences do you notice in your output?
 
 
+### Running the analysis under the FBD model only
 
+To run the analysis "under the prior", navigate to the MCMC panel back in BEAUti. At the bottom of this panel you should see a check box next to `Sample From Prior`. Select this option, change your output file names and export a new xml. Run this in BEAST2 as before.
 
 ```{r hidden_notes, eval=FALSE, echo=FALSE}
-#TODO: need to fix the figs associated with this
+#TODO: double check all the figs associated with this tutorial
+#TODO: Accounting for fossil age uncertainty
 ```
 

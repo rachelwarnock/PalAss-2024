@@ -274,6 +274,18 @@ id="bayesian-tree-inference-using-the-fossilised-birth-death-process-in-beast2"
 class="section level1">
 <h1>Bayesian tree inference using the fossilised birth-death process in
 BEAST2</h1>
+<div id="contents" class="section level4">
+<h4>Contents</h4>
+<ul>
+<li><a href="#read">Read the data</a></li>
+<li><a href="#tips">Tip dates</a></li>
+<li><a href="#site">The site model</a></li>
+<li><a href="#clock">Clock model</a></li>
+<li><a href="#prior">Priors</a></li>
+<li><a href="#mcmc">MCMC settings</a></li>
+<li><a href="#output">Evaluating the output</a></li>
+<li><a href="#next">Next tasks</a></li>
+</ul>
 <p>In this exercise we’ll estimate a time tree of bears under the
 fossilised birth-death (FBD) process. We’ll use a <a
 href="data/bears_morphology_beast.nex">morphological matrix</a> that
@@ -286,17 +298,26 @@ tutorial</a> written by Tracy Heath. The original contains lots of
 useful background information.</p>
 <p>For this exercise create a folder called
 <code>FBD_exercise_BEAST2</code> (or whatever you want).</p>
+</div>
+<div id="software" class="section level4">
+<h4>Software</h4>
+<p>Download the software <a href="https://www.beast2.org">BEAST2 v2.6 or
+above</a>, <a href="https://beast.community/tracer">Tracer v1.7</a> and
+<a href="https://beast.community/figtree">FigTree</a> if you haven’t
+done so already.</p>
 <p>BEAST2 uses an <code>xml</code> file as input, containing all the
 model specifications, including prior parameters and MCMC settings. You
 can create the <code>xml</code> file using the BEAST2 accessory program
 BEAUti.</p>
-<div id="packages" class="section level2">
-<h2>Packages</h2>
+</div>
+<div id="packages" class="section level4">
+<h4>Packages</h4>
 <p>BEAST2 is similar to RevBayes in providing flexible and modular
 options for analysing phylogenetic data in a Bayesian framework. One
 practical difference is the package structure used by BEAST2. There is a
 suite of models in the core BEAST2 program, but there are many other
-models available via packages that you can install using BEAUti.</p>
+models available via packages that you can install also using
+BEAUti.</p>
 <p>For the analysis in this tutorial we need to install the
 <code>SA</code> and <code>MM</code> packages, both developed by Sasha
 Gavryushkina.</p>
@@ -305,9 +326,9 @@ Gavryushkina.</p>
 bottom. This should bring up a confirmation message.</p>
 <p>Restart BEAUTi and we can begin setting up the analysis.</p>
 </div>
-<div id="reading-the-data" class="section level2">
+<div id="read" class="section level2">
 <h2>Reading the data</h2>
-<p>To read in your data, simply drag your nexus file into the partitions
+<p>To read in your data, simply drag your nexus file into the Partitions
 panel. Or go to File &gt; Import Alignment and navigate to your nexus
 file.</p>
 <p>This will bring up a box that asks you to clarify what type of data
@@ -324,13 +345,13 @@ handle this in different ways.</p>
 this.</p>
 <p><img src="beauti-01.png" width="80%" style="padding:10px" /></p>
 </div>
-<div id="tip-dates" class="section level2">
+<div id="tips" class="section level2">
 <h2>Tip dates</h2>
 <p>Move on to the Tip Dates panel and select <code>Use tip dates</code>.
 You might have noticed that the names in the nexus file are appended by
 a number. This is the age information associated with each species.
 BEAUti can parse this information.</p>
-<p>Select auto-configure and then <code>use everything</code> &gt; after
+<p>Select Auto-configure and then <code>use everything</code> &gt; after
 last <code>_</code>. Back in the main window also make sure to select
 <code>Before the present</code> from the drop down menu.
 <code>Since some time in the past</code> is used more commonly for
@@ -344,14 +365,14 @@ in the following BEAUti panels:</p>
 <ol style="list-style-type: decimal">
 <li>The Site Model panel is for the substitution model</li>
 <li>The Clock Model panel is for the clock model</li>
-<li>The Priors panel is for the time tree model <strong>and</strong> all
-the other priors</li>
+<li>The Priors panel is for the time tree model <em>plus</em> all other
+priors</li>
 </ol>
 <p>Important note: there are many more options than the ones you’ll see
 going through the panels in this tutorial. More options are available
 via other packages or you can directly edit the xml.</p>
 </div>
-<div id="the-site-model" class="section level2">
+<div id="site" class="section level2">
 <h2>The site model</h2>
 <p>Head towards the Site Model panel. Because we’re working with
 discrete morphological data, we’re only presented with a limited set of
@@ -368,13 +389,13 @@ will become the starting value.</p>
 <p>If you had molecular data or multiple partitions, more options would
 appear in this panel.</p>
 </div>
-<div id="clock-model" class="section level2">
+<div id="clock" class="section level2">
 <h2>Clock model</h2>
 <p>Move onto the Clock Model panel and simply leave the Strict Clock
 option in place.</p>
 <p><img src="beauti-02b.png" width="80%" style="padding:10px" /></p>
 </div>
-<div id="priors" class="section level2">
+<div id="prior" class="section level2">
 <h2>Priors</h2>
 <p>The Priors panel is where a lot of juicy choices happen. Here you
 will be presented with the tree model options, along with prior options
@@ -392,11 +413,12 @@ sampling proportion option. We’re also fixing Rho. You can leave this as
 <p><img src="beauti-03.png" width="80%" style="padding:10px" /></p>
 <p>Now we’ve set up the tree model, let’s move onto set up all the other
 priors. These are presented below the tree model toggle in alphabetical
-order. Remember that it’s bad practice to stick with the default priors,
-unless you have good reason to.</p>
-<p>First let’s deal with the prior on the shape parameter used for the
-shape parameter in the Gamma sites model. For this we’ll use an
-exponential distribution with a mean of = 1.</p>
+order. I’ll go through them in the following order: substitution model,
+clock model, FBD model. Remember that it’s bad practice to stick with
+the default priors, unless you have good reason to.</p>
+<p>First let’s deal with the prior on the shape parameter of the Gamma
+sites model. For this we’ll use an exponential distribution with a mean
+of = 1.</p>
 <p><img src="beauti-04.png" width="80%" style="padding:10px" /></p>
 <p>Select the clock rate. The default prior on this is a uniform
 distribution between 0 and infinity - this is obviously not a good prior
@@ -410,19 +432,20 @@ class="math inline">\(\alpha\)</span> = 2.0 and <span
 class="math inline">\(\beta\)</span> = 0.1, resulting in a mean around
 0.1.</p>
 <p><img src="beauti-05b.png" width="80%" style="padding:10px" /></p>
-<p>Then let’s specify the sampling proportion and turnover parameters.
+<p>Then let’s look at the sampling proportion and turnover parameters.
 These both lie between 0 and 1, so the default prior of a uniform
 distribution between 0 and 1 is a reasonable choice, in the absence of
-other information about these parameter values. Let’s leave these as
+other information about these parameter values. We’ll leave these as
 they are.</p>
 <p><img src="beauti-07.png" width="80%" style="padding:10px" /></p>
 <p>Now we’ll specify a prior on the origin time parameter. We’ll use the
 oldest bear fossil as a minimum (= 35.0) and a recent estimate for the
 age of carnivores as a maximum (= 55.0). We also need to ensure the
-starting value for the origin is within the bounds. This is currently
-set to 100. Change it to something like 40, so it doesn’t violate the
-bounds.</p>
-<p><img src="beauti-07.png" width="80%" style="padding:10px" /></p>
+starting value for the origin is within these bounds. This is currently
+set to 100, in the box that says <code>initial = [100.0]</code>. Change
+it to something like 40, so it doesn’t violate fall outside the minimum
+and maximum values.</p>
+<p><img src="beauti-07b.png" width="80%" style="padding:10px" /></p>
 <p>Finally, we’ll create a clade constraint to monitor the age of all
 living bears. Click <code>+ Add Prior</code> and select MRCA (= most
 recent common ancestor) prior. Put the following 8 taxa on the righthand
@@ -432,24 +455,26 @@ maritimus</em>, <em>Helarctos malayanus</em>, <em>Ursus americanus</em>,
 <em>Ursus thibetanus</em>. Give the clade a label, e.g.,
 <code>living_bears</code>.</p>
 <p><img src="beauti-08.png" width="80%" style="padding:10px" /></p>
-<p>Leave the <code>monophyletic</code> box unchecked here because we
-don’t want to enforce monophyly of this group, as there might be fossils
-also belonging to this clade. Note this is how you define nodes for
+<p>Leave the <code>monophyletic</code> box unchecked because we don’t
+want to enforce the monophyly of this group, as there might be fossils
+that also belong to this clade. Note this is how you define nodes for
 specifying node calibrations in BEAUti. After defining a clade, you can
 then select a distribution from the drop down menu associated with your
-node.</p>
+node. See <a
+href="https://taming-the-beast.org/tutorials/Introduction-to-BEAST2/">this
+tutorial</a> for more details.</p>
 </div>
-<div id="mcmc-settings" class="section level2">
+<div id="mcmc" class="section level2">
 <h2>MCMC settings</h2>
 <p>Navigate to the MCMC panel to finalise the set up. Our dataset is
-small, so let’s go with <code>100000</code> for the Chain Length. Leave
+small, so let’s go with <code>1000000</code> for the Chain Length. Leave
 the Store Every and Pre Burnin options as they are.</p>
 <p>You can then use the <code>tracelog</code> and <code>treelog</code>
 toggles to specify the logging frequency. Let’s change the logging
-frequency for both of these to <code>100</code>, so we end up with 10000
-posterior samples. You can also change the output file names here. The
-trees file will keep the same prefix as the log file if you don’t change
-the default <code>$(tree)</code>.</p>
+frequency for both of these to <code>10000</code>, so we end up with
+10000 posterior samples. You can also change the output file names here.
+The trees file will keep the same prefix as the log file if you don’t
+change the default <code>$(tree)</code>.</p>
 <p><img src="beauti-09.png" width="80%" style="padding:10px" /></p>
 </div>
 <div id="exporting-the-xml" class="section level2">
@@ -457,13 +482,16 @@ the default <code>$(tree)</code>.</p>
 <p>To create the input file for BEAST2 we need to export the
 <code>xml</code> file. Simply go to File &gt; Save As and navigate to
 where you want to save the file on your computer.</p>
-<p>Close BEAUti for now. If you have time, you can come back and set up
-more analyses using the molecular data.</p>
+<p>Leave BEAUti open for now. If you have time, you can come back and
+set up more analyses using the molecular data.</p>
 </div>
 <div id="running-beast2" class="section level2">
 <h2>Running BEAST2</h2>
-<p>This might take a while run pretty quickly. Meanwhile, you could move
-on to the <a href="#next">Next tasks</a>.</p>
+<p>Open the program BEAST. This will open a window that gives you the
+option to select your xml file. Navigate to your xml file and click
+<code>Run</code>!</p>
+<p>The analysis might take a while to run. Meanwhile, you could move on
+to the <a href="#next">Next tasks</a>.</p>
 </div>
 <div id="evaluating-the-output" class="section level2">
 <h2>Evaluating the output</h2>
@@ -506,16 +534,28 @@ notice any a bit odd?</p>
 </div>
 <div id="next" class="section level2">
 <h2>Next tasks</h2>
+<div id="add-molecular-sequence-data" class="section level3">
+<h3>Add molecular sequence data</h3>
 <p>Try adding the molecular sequence alignment that complements this
 dataset. This is an alignment with 1000 sites of the mitochondrial gene
 cytochrome oxidase B for 10 living species.</p>
-<p>There’s a bug in the latest version of BEAUti that makes it tricky to
-set up different partitions, so we’re going to use a precooked xml for
-this purpose. You can download this <a
-href="bears_morpho_cytb.xml">here</a> and get it running in BEAST.</p>
+<p>Note there’s a bug in BEAUti v2.6 that makes it tricky to set up
+different partitions, so you can use a precooked xml for this purpose.
+You can download this <a href="bears_morpho_cytb.xml">here</a> and get
+it running in BEAST.</p>
 <blockquote>
 <p>What differences do you notice in your output?</p>
 </blockquote>
+</div>
+<div id="running-the-analysis-under-the-fbd-model-only"
+class="section level3">
+<h3>Running the analysis under the FBD model only</h3>
+<p>To run the analysis “under the prior”, navigate to the MCMC panel
+back in BEAUti. At the bottom of this panel you should see a check box
+next to <code>Sample From Prior</code>. Select this option, change your
+output file names and export a new xml. Run this in BEAST2 as
+before.</p>
+</div>
 </div>
 </div>
 

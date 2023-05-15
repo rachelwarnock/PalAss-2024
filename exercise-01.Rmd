@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Bayesian tree inference using the fossilised birth-death process in RevBayes
 
 #### Contents
-* [Read in the data](#read)
+* [Read the data](#read)
 * [Time tree model](#time)
 * [Strict clock model](#clock)
 * [Substitution model](#Mk)
@@ -108,7 +108,7 @@ moves.append( mvSlide(origin_time, weight = 1.0) )
 Finally, we'll specify the FBD model, along with moves on the tree topology and branch lengths.
 
 ```{r tree_prior, eval=FALSE}
-tree ~ dnFBDP(lambda = speciation_rate, mu = extinction_rate, psi = fossil_samp_rate, rho = rho, origin = origin_time, taxa = taxa)
+tree ~ dnFossilizedBirthDeath(lambda = speciation_rate, mu = extinction_rate, psi = fossil_samp_rate, rho = rho, origin = origin_time, taxa = taxa)
 
 # moves to search tree space
 moves.append( mvFNPR(tree, weight = 15.0) )
@@ -223,7 +223,7 @@ monitors.append( mnScreen(printgen = 100, age_extant, num_samp_anc, origin_time)
 Finally, we'll set up the MCMC run using the `mcmc` function, specifying our model, the vector of monitors and the vector of moves and run the chain for 100000 generations.
 
 ```{r mcmc, eval=FALSE}
-mymcmc = mcmc(mymodel, monitors, moves)
+mymcmc = mcmc(mymodel, monitors, moves, nruns = 2, combine = "mixed")
 mymcmc.run(generations = 100000, tuningInterval = 1000)
 ```
 
