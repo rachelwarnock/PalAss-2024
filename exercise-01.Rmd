@@ -11,6 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Bayesian tree inference using the fossilised birth-death process in RevBayes
 
+#### Contents
+* [Read in the data](#read)
+* [Time tree model](#time)
+* [Strict clock model](#clock)
+* [Substitution model](#Mk)
+* [MCMC settings](#mcmc)
+* [Evaluating the output](#output)
+* [Next tasks](#next)
+
 In this exercise we'll estimate a time tree of bears under the fossilised birth-death (FBD) process. We'll use a [morphological matrix](data/bears_morphology.nex) that comprises 62 binary characters for 18 living and fossil bears. We'll also use [age information](data/bears_taxa.tsv) associated with our taxa. Download these files and examine the contents. The exercise is adapted from this [published version](https://hal.inria.fr/PGE/hal-02536394) of the exercise, which contains more background information.
 
 For this exercise create a folder called `FBD_exercise_RevBayes` (or whatever you want). Then create two sub-directories: `data` and `scripts`. Recall that for divergence time estimation we need three model components, so we'll create the following scripts:
@@ -20,9 +29,13 @@ For this exercise create a folder called `FBD_exercise_RevBayes` (or whatever yo
   3. `Mk+G.Rev` for the substitution model
   4. `clock_strict_morpho.Rev` for the clock model
 
+#### Software 
+
+Download the software [RevBayes v1.2](https://revbayes.github.io/download), [Tracer v1.7](https://beast.community/tracer) and [FigTree](https://beast.community/figtree) if you haven't done so already.
+
 Edit the scripts in a text editor of your choice.
 
-## Read in the data and define helper variables
+## Read in the data and define helper variables {#read}
 
 Start with your `main.Rev` script.
 As in previous RevBayes exercises, we'll start by reading in the data and defining some helper variables.
@@ -44,10 +57,9 @@ moves    = VectorMoves()
 monitors = VectorMonitors()
 ```
 
-## Time tree model
+## Time tree model {#time}
 
-We will use the FBD process as our tree model, which describes the distribution of most likely trees, given the model parameters (speciation, extinction, fossil sampling) and fossil ages. 
-Note that because the fossil ages are data, the FBD model is not strictly a prior.
+We will use the FBD process as our tree model or *tree prior*. This describes the distribution of most probable trees, given the speciation, extinction, and fossil sampling processes, combined with fossil ages. 
 
 Go to your `FBD_dating.Rev` script to set this up.
 
@@ -90,7 +102,7 @@ We'll use the oldest bear fossil as a minimum (35.0) and a recent estimate for t
 ```{r node_date, eval=FALSE}
 # prior and move on the origin
 origin_time ~ dnUnif(37.0, 55.0)
-moves.append( mvSlide(origin_time, weight=1.0) )
+moves.append( mvSlide(origin_time, weight = 1.0) )
 ```
 
 Finally, we'll specify the FBD model, along with moves on the tree topology and branch lengths.
@@ -124,7 +136,7 @@ num_samp_anc := tree.numSampledAncestors()
 
 ```{r hidden_notes, eval=FALSE, echo=FALSE}
 #TODO: clock model for molecular data?
-#TODO: Remove the age uncertainty?
+#TODO: age uncertainty?
 #TODO: variable coding? RevBayes does what Lewis says
 #TODO: reference the age of carnivores
 #TODO: acknowledge the raw data sources
@@ -134,9 +146,11 @@ num_samp_anc := tree.numSampledAncestors()
 #TODO: Better description of the origin. This parameter approximates the age of the clade.
 
 #`exclude = ["F"]` here means fossil ages will be excluded from the log file - I've done this because the way RevBayes outputs this information is a bit confusing, so we'll ignore that for the moment.
+
+#Note that although the fossil ages are data, we refer to the FBD model as the "tree prior".
 ```
 
-## Strict clock model
+## Strict clock model {#clock}
 
 For simplicity, we'll use a strict clock model to describe the rate of character change, assuming the rate is constant over time and across all branches in our tree.
 
@@ -150,11 +164,11 @@ moves.append( mvScale(branch_rates, lambda = 0.5, tune = true, weight = 3.0) )
 
 This rate will be used for all branches.
 
-## Substitution model
+## Substitution model {#Mk}
 
 Next we'll specify the Mk substitution model in the `Mk+G.Rev` file, which describes the probability of transitioning from one character state to another. This model is a generalisation of the Jukes-Cantor model for $k$ states.
 
-First we'll use the `fnJC` function to define a **Q matrix** for 2 states (0, 1), since we only have two character states in our morphological character matrix. Remember that under this model rates of change between states and state frequencies are equal.
+First we'll use the `fnJC` function to define a Q matrix for 2 states (0, 1), since we only have two character states in our morphological character matrix. Remember that under this model rates of change between states and state frequencies are equal.
 
 ```{r Q, eval=FALSE}
 Q <- fnJC(2)
@@ -176,7 +190,7 @@ seq ~ dnPhyloCTMC(tree = tree, Q = Q, type = "Standard", branchRates = branch_ra
 seq.clamp(morpho)
 ```
 
-## MCMC settings
+## MCMC settings {#mcmc}
 
 Back in `main.Rev` add the following lines to include the tree, clock and substitution models.
 
@@ -217,7 +231,7 @@ Note we've added the argument `tuningInterval = 1000`. This tells the chain how 
 
 This might take a while to run. Meanwhile, you could move on to the [Next tasks](#next).
 
-## Evaluating the output
+## Evaluating the output {#output}
 
 As before, open your `.log` file in Tracer.  
 It should look something like this. 
@@ -273,19 +287,19 @@ morpho.addMissingTaxa( taxa )
 ```
 
 That's it! 
-Now you can go ahead and set up the GTR model as you did in the [previous exercise](https://boussau.github.io/tutorials/COME_tutorials/8_RevBayesTutorial/).
+Now you can go ahead and set up the GTR model as you did in the [previous exercise](https://revbayes.github.io/tutorials/ctmc/).
 
 > What differences do you notice in your output?
 
 ### Running the analysis under the FBD model only
 
-Try running the analysis under the prior. Simply add `underPrior = TRUE` to the MCMC run function.
+Try running the analysis "under the prior". Simply add `underPrior = TRUE` to the MCMC run function.
 
 ```{r prior, eval=FALSE}
 mymcmc.run(generations = 10000, tuningInterval = 1000, underPrior = TRUE)
 ```
 
-Note this is not strictly "under the prior" because the fossil ages are data but RevBayes doesn't consider the FBD as part of the likelihood it prints out, so you can still choose the regular option for running the analysis under the prior to distinguish the signal coming from the FBD/fossil age data vs. the FBD combined with the sequence/morpho data. 
+Note it's a bit funny to refer to this as "under the prior" because the fossil ages are data but RevBayes doesn't consider the FBD as part of the likelihood it prints out, so you can still choose the regular option for running the analysis under the prior to distinguish the signal coming from the FBD/fossil age data vs. the FBD combined with the sequence/morpho data. 
 
 > Compare you results to the posterior obtained using in the previous steps. What information do we gain from the morphological / molecular data?
 
@@ -311,4 +325,4 @@ for(i in 1:fossils.size())
 }
 ```
 
-> Compare your results to the posterior obtained using in the previous steps. Do the results change?
+> Compare your results to the posterior obtained in the previous steps. Do the results change?

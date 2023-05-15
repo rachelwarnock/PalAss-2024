@@ -13,7 +13,7 @@
 
 <title>exercise-01.knit</title>
 
-<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -141,11 +141,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -174,8 +178,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -183,16 +187,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -277,6 +274,17 @@ id="bayesian-tree-inference-using-the-fossilised-birth-death-process-in-revbayes
 class="section level1">
 <h1>Bayesian tree inference using the fossilised birth-death process in
 RevBayes</h1>
+<div id="contents" class="section level4">
+<h4>Contents</h4>
+<ul>
+<li><a href="#read">Read in the data</a></li>
+<li><a href="#time">Time tree model</a></li>
+<li><a href="#clock">Strict clock model</a></li>
+<li><a href="#Mk">Substitution model</a></li>
+<li><a href="#mcmc">MCMC settings</a></li>
+<li><a href="#output">Evaluating the output</a></li>
+<li><a href="#next">Next tasks</a></li>
+</ul>
 <p>In this exercise we’ll estimate a time tree of bears under the
 fossilised birth-death (FBD) process. We’ll use a <a
 href="data/bears_morphology.nex">morphological matrix</a> that comprises
@@ -298,9 +306,17 @@ other scripts and the MCMC settings</li>
 <li><code>Mk+G.Rev</code> for the substitution model</li>
 <li><code>clock_strict_morpho.Rev</code> for the clock model</li>
 </ol>
+</div>
+<div id="software" class="section level4">
+<h4>Software</h4>
+<p>Download the software <a
+href="https://revbayes.github.io/download">RevBayes v1.2</a>, <a
+href="https://beast.community/tracer">Tracer v1.7</a> and <a
+href="https://beast.community/figtree">FigTree</a> if you haven’t done
+so already.</p>
 <p>Edit the scripts in a text editor of your choice.</p>
-<div id="read-in-the-data-and-define-helper-variables"
-class="section level2">
+</div>
+<div id="read" class="section level2">
 <h2>Read in the data and define helper variables</h2>
 <p>Start with your <code>main.Rev</code> script. As in previous RevBayes
 exercises, we’ll start by reading in the data and defining some helper
@@ -313,13 +329,12 @@ num_branches &lt;- 2 * num_taxa - 2 # number of branches in an rooted tree</code
 <pre class="r"><code>moves    = VectorMoves()
 monitors = VectorMonitors()</code></pre>
 </div>
-<div id="time-tree-model" class="section level2">
+<div id="time" class="section level2">
 <h2>Time tree model</h2>
-<p>We will use the FBD process as our tree model, which describes the
-distribution of most likely trees, given the model parameters
-(speciation, extinction, fossil sampling) and fossil ages. Note that
-because the fossil ages are data, the FBD model is not strictly a
-prior.</p>
+<p>We will use the FBD process as our tree model or <em>tree prior</em>.
+This describes the distribution of most probable trees, given the
+speciation, extinction, and fossil sampling processes, combined with
+fossil ages.</p>
 <p>Go to your <code>FBD_dating.Rev</code> script to set this up.</p>
 <p>Three of the key parameters of the FBD model are speciation (or
 birth) rate (<span class="math inline">\(\lambda\)</span>), extinction
@@ -350,7 +365,7 @@ oldest bear fossil as a minimum (35.0) and a recent estimate for the age
 of carnivores as a maximum (55.0).</p>
 <pre class="r"><code># prior and move on the origin
 origin_time ~ dnUnif(37.0, 55.0)
-moves.append( mvSlide(origin_time, weight=1.0) )</code></pre>
+moves.append( mvSlide(origin_time, weight = 1.0) )</code></pre>
 <p>Finally, we’ll specify the FBD model, along with moves on the tree
 topology and branch lengths.</p>
 <pre class="r"><code>tree ~ dnFBDP(lambda = speciation_rate, mu = extinction_rate, psi = fossil_samp_rate, rho = rho, origin = origin_time, taxa = taxa)
@@ -374,7 +389,7 @@ our posterior trees, so let’s set up another deterministic variable to
 monitor this.</p>
 <pre class="r"><code>num_samp_anc := tree.numSampledAncestors()</code></pre>
 </div>
-<div id="strict-clock-model" class="section level2">
+<div id="clock" class="section level2">
 <h2>Strict clock model</h2>
 <p>For simplicity, we’ll use a strict clock model to describe the rate
 of character change, assuming the rate is constant over time and across
@@ -386,18 +401,17 @@ the rate of evolution, so as before we’ll use an exponential prior.</p>
 moves.append( mvScale(branch_rates, lambda = 0.5, tune = true, weight = 3.0) )</code></pre>
 <p>This rate will be used for all branches.</p>
 </div>
-<div id="substitution-model" class="section level2">
+<div id="Mk" class="section level2">
 <h2>Substitution model</h2>
 <p>Next we’ll specify the Mk substitution model in the
 <code>Mk+G.Rev</code> file, which describes the probability of
 transitioning from one character state to another. This model is a
 generalisation of the Jukes-Cantor model for <span
 class="math inline">\(k\)</span> states.</p>
-<p>First we’ll use the <code>fnJC</code> function to define a <strong>Q
-matrix</strong> for 2 states (0, 1), since we only have two character
-states in our morphological character matrix. Remember that under this
-model rates of change between states and state frequencies are
-equal.</p>
+<p>First we’ll use the <code>fnJC</code> function to define a Q matrix
+for 2 states (0, 1), since we only have two character states in our
+morphological character matrix. Remember that under this model rates of
+change between states and state frequencies are equal.</p>
 <pre class="r"><code>Q &lt;- fnJC(2)</code></pre>
 <p>Then we’ll add the following lines to add the Gamma sites model,
 using an exponential prior with mean = 1 on the shape parameter
@@ -413,7 +427,7 @@ uses the term “standard” for morphological data.</p>
 <pre class="r"><code>seq ~ dnPhyloCTMC(tree = tree, Q = Q, type = &quot;Standard&quot;, branchRates = branch_rates, siteRates = rates_morpho)
 seq.clamp(morpho)</code></pre>
 </div>
-<div id="mcmc-settings" class="section level2">
+<div id="mcmc" class="section level2">
 <h2>MCMC settings</h2>
 <p>Back in <code>main.Rev</code> add the following lines to include the
 tree, clock and substitution models.</p>
@@ -446,7 +460,7 @@ selection of parameters that maximise efficiency of the MCMC.</p>
 <p>This might take a while to run. Meanwhile, you could move on to the
 <a href="#next">Next tasks</a>.</p>
 </div>
-<div id="evaluating-the-output" class="section level2">
+<div id="output" class="section level2">
 <h2>Evaluating the output</h2>
 <p>As before, open your <code>.log</code> file in Tracer.<br />
 It should look something like this.</p>
@@ -492,8 +506,7 @@ we don’t have molecular sequence data for all species.</p>
 <pre class="r"><code>cytb.addMissingTaxa( taxa )
 morpho.addMissingTaxa( taxa )</code></pre>
 <p>That’s it! Now you can go ahead and set up the GTR model as you did
-in the <a
-href="https://boussau.github.io/tutorials/COME_tutorials/8_RevBayesTutorial/">previous
+in the <a href="https://revbayes.github.io/tutorials/ctmc/">previous
 exercise</a>.</p>
 <blockquote>
 <p>What differences do you notice in your output?</p>
@@ -502,15 +515,15 @@ exercise</a>.</p>
 <div id="running-the-analysis-under-the-fbd-model-only"
 class="section level3">
 <h3>Running the analysis under the FBD model only</h3>
-<p>Try running the analysis under the prior. Simply add
+<p>Try running the analysis “under the prior”. Simply add
 <code>underPrior = TRUE</code> to the MCMC run function.</p>
 <pre class="r"><code>mymcmc.run(generations = 10000, tuningInterval = 1000, underPrior = TRUE)</code></pre>
-<p>Note this is not strictly “under the prior” because the fossil ages
-are data but RevBayes doesn’t consider the FBD as part of the likelihood
-it prints out, so you can still choose the regular option for running
-the analysis under the prior to distinguish the signal coming from the
-FBD/fossil age data vs. the FBD combined with the sequence/morpho
-data.</p>
+<p>Note it’s a bit funny to refer to this as “under the prior” because
+the fossil ages are data but RevBayes doesn’t consider the FBD as part
+of the likelihood it prints out, so you can still choose the regular
+option for running the analysis under the prior to distinguish the
+signal coming from the FBD/fossil age data vs. the FBD combined with the
+sequence/morpho data.</p>
 <blockquote>
 <p>Compare you results to the posterior obtained using in the previous
 steps. What information do we gain from the morphological / molecular
@@ -541,8 +554,8 @@ for(i in 1:fossils.size())
     F[i].clamp( 0 )
 }</code></pre>
 <blockquote>
-<p>Compare your results to the posterior obtained using in the previous
-steps. Do the results change?</p>
+<p>Compare your results to the posterior obtained in the previous steps.
+Do the results change?</p>
 </blockquote>
 </div>
 </div>

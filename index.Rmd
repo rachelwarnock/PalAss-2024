@@ -23,9 +23,9 @@ knitr::include_graphics("bear.jpg")
 
 The above exercises are adapted from tutorials written by Tracy Heath, Joëlle Barido-Sottani and co-authors. 
 
-Extended versions of tutorials can be found on the [Taming the Beast](https://taming-the-beast.org/tutorials/) site and the [RevBayes tutorial page](https://revbayes.github.io/tutorials/).
+Extended versions of both tutorials can be found on the [Taming the Beast](https://taming-the-beast.org/tutorials/) site and the [RevBayes tutorial page](https://revbayes.github.io/tutorials/).
 
-The morphology only analysis was original published [here](https://hal.inria.fr/PGE/hal-02536394).
+The morphology only analysis was originally published [here](https://hal.inria.fr/PGE/hal-02536394).
 
 
 # Any questions?
