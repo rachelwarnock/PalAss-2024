@@ -8,12 +8,14 @@ title: "Bayesian divergence time estimation"
 
 These exercises focus on the use of the fossilised birth-death (FBD) process for Bayesian divergence time estimation using a dataset of living and extinct bears.
 
-1. Dating exercise using [RevBayes](https://revbayes.github.io) 
-2. Dating exercise using [BEAST2](https://www.beast2.org/)
+1. Dating [exercise](exercise-01.html) using [RevBayes](https://revbayes.github.io) 
+2. Dating [exercise](exercise-02.html) using [BEAST2](https://www.beast2.org/)
 
-Click above to begin!
+You will also need to install the software [Tracer](http://beast.community/tracer) and [FigTree](https://github.com/rambaut/figtree/releases).
 
-3. You can also use simulations to explore assumptions of the FBD process (and related birth-process models) using the [FossilSim](https://github.com/fossilsim/fossilsim)
+Click on one of the links at the top to begin!
+
+3. You can also use simulations to explore assumptions of the FBD process (and related birth-process models) using the [FossilSim](https://github.com/fossilsim/fossilsim) R package application [FossilSimShiny](https://github.com/fossilsim/FossilSimShiny). Associated exercise available [here](https://phylogenetics-fau.netlify.app/fossilsimshiny).
 
 ```{r, echo=FALSE, out.width="50%",  out.extra='style="float:right; padding:30px"'}
 knitr::include_graphics("bear.jpg")
@@ -23,7 +25,7 @@ knitr::include_graphics("bear.jpg")
 
 The above exercises are adapted from tutorials written by Tracy Heath, Joëlle Barido-Sottani and co-authors. 
 
-Extended versions of both tutorials can be found on the [Taming the Beast](https://taming-the-beast.org/tutorials/) site and the [RevBayes tutorial page](https://revbayes.github.io/tutorials/).
+Extended versions of both tutorials can be found on the [Taming the Beast site](https://taming-the-beast.org/tutorials/FBD-tutorial/) and the [RevBayes tutorial page](https://revbayes.github.io/tutorials/).
 
 The morphology only analysis was originally published [here](https://hal.inria.fr/PGE/hal-02536394).
 

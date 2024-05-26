@@ -13,7 +13,7 @@
 
 <title>exercise-01.knit</title>
 
-<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -277,6 +277,7 @@ RevBayes</h1>
 <div id="contents" class="section level4">
 <h4>Contents</h4>
 <ul>
+<li><a href="#start">Getting started</a></li>
 <li><a href="#read">Read the data</a></li>
 <li><a href="#time">Time tree model</a></li>
 <li><a href="#clock">Strict clock model</a></li>
@@ -294,27 +295,32 @@ Download these files and examine the contents. The exercise is adapted
 from this <a href="https://hal.inria.fr/PGE/hal-02536394">published
 version</a> of the exercise, which contains more background
 information.</p>
-<p>For this exercise create a folder called
-<code>FBD_exercise_RevBayes</code> (or whatever you want). Then create
-two sub-directories: <code>data</code> and <code>scripts</code>. Recall
-that for divergence time estimation we need three model components, so
-we’ll create the following scripts:</p>
-<ol style="list-style-type: decimal">
-<li><code>main.Rev</code> for reading the data, organising calls to
-other scripts and the MCMC settings</li>
-<li><code>FBD_dating.Rev</code> for the time tree model</li>
-<li><code>Mk+G.Rev</code> for the substitution model</li>
-<li><code>clock_strict_morpho.Rev</code> for the clock model</li>
-</ol>
 </div>
 <div id="software" class="section level4">
 <h4>Software</h4>
 <p>Download the software <a
-href="https://revbayes.github.io/download">RevBayes v1.2</a>, <a
-href="https://beast.community/tracer">Tracer v1.7</a> and <a
+href="https://revbayes.github.io/download">RevBayes</a>, <a
+href="https://beast.community/tracer">Tracer</a> and <a
 href="https://beast.community/figtree">FigTree</a> if you haven’t done
-so already.</p>
+so already. This tutorial uses RevBayes 1.2.3.</p>
 <p>Edit the scripts in a text editor of your choice.</p>
+</div>
+<div id="start" class="section level2">
+<h2>Getting started</h2>
+<p>For this exercise create a folder called
+<code>FBD_exercise_RevBayes</code> (or whatever you want). Then create
+two sub-directories: <code>data</code> and <code>scripts</code>.
+Download the data and move it to the <code>data</code> directory.</p>
+<p>Recall that for divergence time estimation we need three model
+components, so we’ll create the following scripts:</p>
+<ol style="list-style-type: decimal">
+<li><code>main.Rev</code> for reading the data, organising calls to
+other scripts and the MCMC settings</li>
+<li><code>scripts/FBD_dating.Rev</code> for the time tree model</li>
+<li><code>scripts/Mk+G.Rev</code> for the substitution model</li>
+<li><code>scripts/clock_strict_morpho.Rev</code> for the clock
+model</li>
+</ol>
 </div>
 <div id="read" class="section level2">
 <h2>Read in the data and define helper variables</h2>
@@ -331,10 +337,10 @@ monitors = VectorMonitors()</code></pre>
 </div>
 <div id="time" class="section level2">
 <h2>Time tree model</h2>
-<p>We will use the FBD process as our tree model or <em>tree prior</em>.
-This describes the distribution of most probable trees, given the
-speciation, extinction, and fossil sampling processes, combined with
-fossil ages.</p>
+<p>We will use the FBD process as our time tree model. This describes
+the distribution of most probable trees, given the speciation,
+extinction, and fossil sampling processes, combined with the fossil age
+information.</p>
 <p>Go to your <code>FBD_dating.Rev</code> script to set this up.</p>
 <p>Three of the key parameters of the FBD model are speciation (or
 birth) rate (<span class="math inline">\(\lambda\)</span>), extinction
@@ -347,7 +353,8 @@ extinction_rate ~ dnExponential(10)
 fossil_samp_rate ~ dnExponential(10)</code></pre>
 <p>Each parameter is a stochastic variable drawn from an exponential
 distribution with <span class="math inline">\(\delta\)</span> = 10 and a
-mean of <span class="math inline">\(1/\delta\)</span> = 0.1.</p>
+mean of <span class="math inline">\(1/\delta\)</span> = 0.1. Estimates
+of speciation, extinction and sampling tend to be on this order.</p>
 <p>Next specify the moves on these parameters.</p>
 <pre class="r"><code>moves.append( mvScale(speciation_rate, lambda = 0.5, tune = true, weight = 3.0) )
 moves.append( mvScale(extinction_rate, lambda = 0.5, tune = true, weight = 3.0) )
@@ -360,15 +367,18 @@ turnover := extinction_rate/speciation_rate</code></pre>
 class="math inline">\(\rho\)</span>). Since we sample all extant bears,
 we’ll specify this probability as a constant variable = 1.0.</p>
 <pre class="r"><code>rho &lt;- 1.0</code></pre>
-<p>Now we’ll specify a prior on the origin time parameter. We’ll use the
-oldest bear fossil as a minimum (35.0) and a recent estimate for the age
-of carnivores as a maximum (55.0).</p>
+<p>Now we’ll specify a prior on the origin time parameter. The origin
+represents the beginning of the process and will be older than the root.
+It’s a bit tricky to interpret this parameter, but you can think of it
+as the branching time between bears and the broader tree of mammals.
+We’ll use the oldest bear fossil as a minimum (35.0) and a recent
+estimate for the age of carnivores as a maximum (55.0).</p>
 <pre class="r"><code># prior and move on the origin
 origin_time ~ dnUnif(37.0, 55.0)
 moves.append( mvSlide(origin_time, weight = 1.0) )</code></pre>
-<p>Finally, we’ll specify the FBD model, along with moves on the tree
+<p>Next we’ll specify the FBD model, along with moves on the tree
 topology and branch lengths.</p>
-<pre class="r"><code>tree ~ dnFossilizedBirthDeath(lambda = speciation_rate, mu = extinction_rate, psi = fossil_samp_rate, rho = rho, origin = origin_time, taxa = taxa)
+<pre class="r"><code>tree ~ dnBDSTP(lambda = speciation_rate, mu = extinction_rate, psi = fossil_samp_rate, rho = rho, origin = origin_time, taxa = taxa, r = 0)
 
 # moves to search tree space
 moves.append( mvFNPR(tree, weight = 15.0) )
@@ -395,8 +405,10 @@ monitor this.</p>
 of character change, assuming the rate is constant over time and across
 all branches in our tree.</p>
 <p>Open your <code>clock_strict_morpho.Rev</code> script. We don’t know
-the rate of evolution, so as before we’ll use an exponential prior.</p>
-<pre class="r"><code>branch_rates ~ dnExponential(10.0)
+the rate of evolution, so as before we’ll use an exponential prior, with
+a mean of 0.01, since rates of morphological evolution tend to be
+low.</p>
+<pre class="r"><code>branch_rates ~ dnExponential(100)
 
 moves.append( mvScale(branch_rates, lambda = 0.5, tune = true, weight = 3.0) )</code></pre>
 <p>This rate will be used for all branches.</p>
@@ -437,8 +449,7 @@ source(&quot;scripts/FBD_dating.Rev&quot;)
 source(&quot;scripts/clock_strict_morpho.Rev&quot;)
 # substitution model
 source(&quot;scripts/Mk+G.Rev&quot;)</code></pre>
-<p>The MCMC set up is very similar to before. First we create the
-variable <code>mymodel</code>.</p>
+<p>First we create the variable <code>mymodel</code>.</p>
 <pre class="r"><code>mymodel = model(tree)</code></pre>
 <p>Then we define a set of monitors to capture the output.</p>
 <pre class="r"><code># parameters printed to file
@@ -449,14 +460,22 @@ monitors.append( mnFile(filename = &quot;output/bears_FBD_morpho.trees&quot;, pr
 monitors.append( mnScreen(printgen = 100, age_extant, num_samp_anc, origin_time) )</code></pre>
 <p>Finally, we’ll set up the MCMC run using the <code>mcmc</code>
 function, specifying our model, the vector of monitors and the vector of
-moves and run the chain for 100000 generations.</p>
+moves and run 2 chains for 100000 generations.</p>
 <pre class="r"><code>mymcmc = mcmc(mymodel, monitors, moves, nruns = 2, combine = &quot;mixed&quot;)
 mymcmc.run(generations = 100000, tuningInterval = 1000)</code></pre>
 <p>Note we’ve added the argument <code>tuningInterval = 1000</code>.
 This tells the chain how long to spend optimising the MCMC moves.
 Different datasets behave differently <span
 class="math inline">\(-\)</span> the above option partly automates the
-selection of parameters that maximise efficiency of the MCMC.</p>
+selection of parameters that maximise efficiency of the MCMC but it can
+be more effective to apply multiple moves to the same parameter.</p>
+<p>Add the following to the end of your script to generate a summary
+tree.</p>
+<p>Next let’s generate a summary tree.</p>
+<pre class="r"><code># generate a summary tree
+trace = readTreeTrace(&quot;output/bears_FBD_morpho.trees&quot;)
+mccTree(trace, file = &quot;output/bears_FBD_morpho.mcc.tre&quot;, positiveBranchLengths = TRUE)
+q()</code></pre>
 <p>This might take a while to run. Meanwhile, you could move on to the
 <a href="#next">Next tasks</a>.</p>
 </div>
@@ -470,11 +489,9 @@ It should look something like this.</p>
 the analysis converged?</p>
 </blockquote>
 <blockquote>
-<p>What is the age of the most common recent ancestor of bears?</p>
+<p>What is the age of the most recent common ancestor of living
+bears?</p>
 </blockquote>
-<p>Next let’s generate a summary tree.</p>
-<pre class="r"><code>trace = readTreeTrace(&quot;output/bears_FBD_morpho.trees&quot;)
-mccTree(trace, file = &quot;output/bears_FBD_morpho.mcc.tre&quot;, positiveBranchLengths = TRUE)</code></pre>
 <p>Once you have your summary tree, open it in FigTree and play around
 with the settings. See if you can get something that looks like
 this.</p>
@@ -505,9 +522,39 @@ cytb &lt;- readDiscreteCharacterData(&quot;data/bears_cytb.nex&quot;)</code></pr
 we don’t have molecular sequence data for all species.</p>
 <pre class="r"><code>cytb.addMissingTaxa( taxa )
 morpho.addMissingTaxa( taxa )</code></pre>
-<p>That’s it! Now you can go ahead and set up the GTR model as you did
-in the <a href="https://revbayes.github.io/tutorials/ctmc/">previous
-exercise</a>.</p>
+<p>We need to add a clock model for the molecular partition. Let’s use a
+relaxed clock model. We’ll use the popular uncorrelated lognormal rates
+model, which uses independent rates across branches. See <a
+href="https://revbayes.github.io/tutorials/clocks/">this tutorial</a>
+for more details of different clock models.</p>
+<pre class="r"><code>branch_rates_mean ~ dnExponential(10.0)
+moves.append( mvScale(branch_rates_mean, lambda = 0.5, tune = true, weight = 3.0) )
+
+for(i in 1:num_branches){
+   brates_cytb[i] ~ dnExponential(branch_rates_mean)
+   moves.append( mvScale(brates_cytb[i], lambda = 1, tune = true, weight = 2.0))
+}</code></pre>
+<p>Now you can go ahead and set up the GTR+G model as you did above and
+in <a href="https://revbayes.github.io/tutorials/ctmc/">previous
+exercises</a> (or whatever substitution model you like). Watch you don’t
+overwrite any variables that are already used for your mophological
+partition, e.g., <code>Q</code> or <code>branch_rates</code>.</p>
+<p>Add your new scripts to <code>main.Rev</code>.</p>
+<pre class="r"><code>source(&quot;scripts/clock_UEC_cytb.Rev&quot;)
+source(&quot;scripts/GTR+G.Rev&quot;)</code></pre>
+<p>Update all your output file names, so you don’t overwrite any of your
+previous output!</p>
+<pre class="r"><code># parameters printed to file
+monitors.append( mnModel(filename = &quot;output/bears_FBD_morpho+cytb.log&quot;, printgen = 100) )
+# trees printed to file
+monitors.append( mnFile(filename = &quot;output/bears_FBD_morpho+cytb.trees&quot;, printgen = 100, tree) )
+
+...
+
+# generate a summary tree
+trace = readTreeTrace(&quot;output/bears_FBD_morpho+cytb.trees&quot;)
+mccTree(trace, file = &quot;output/bears_FBD_morpho+cytb.mcc.tre&quot;, positiveBranchLengths = TRUE)</code></pre>
+<p>That’s it!</p>
 <blockquote>
 <p>What differences do you notice in your output?</p>
 </blockquote>

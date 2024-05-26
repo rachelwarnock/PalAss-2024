@@ -13,7 +13,7 @@
 
 <title>exercise-02.knit</title>
 
-<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -301,10 +301,10 @@ useful background information.</p>
 </div>
 <div id="software" class="section level4">
 <h4>Software</h4>
-<p>Download the software <a href="https://www.beast2.org">BEAST2 v2.6 or
-above</a>, <a href="https://beast.community/tracer">Tracer v1.7</a> and
+<p>Download the software <a href="https://www.beast2.org">BEAST2
+v2.7</a>, <a href="https://beast.community/tracer">Tracer v1.7</a> and
 <a href="https://beast.community/figtree">FigTree</a> if you haven’t
-done so already.</p>
+done so already. This tutorial uses RevBayes 1.2.3.</p>
 <p>BEAST2 uses an <code>xml</code> file as input, containing all the
 model specifications, including prior parameters and MCMC settings. You
 can create the <code>xml</code> file using the BEAST2 accessory program
@@ -324,23 +324,23 @@ Gavryushkina.</p>
 <p>Open BEAUTi go to File &gt; Manage Packages, scroll down, select the
 <code>SA</code> and <code>MM</code> packages and hit Install at the
 bottom. This should bring up a confirmation message.</p>
-<p>Restart BEAUTi and we can begin setting up the analysis.</p>
+<p><strong>Restart BEAUTi</strong> and we can begin setting up the
+analysis.</p>
 </div>
 <div id="read" class="section level2">
 <h2>Reading the data</h2>
-<p>To read in your data, simply drag your nexus file into the Partitions
-panel. Or go to File &gt; Import Alignment and navigate to your nexus
-file.</p>
-<p>This will bring up a box that asks you to clarify what type of data
-you have. Select Add Morphological Data.</p>
-<p>This will then bring up a box that says, ‘Would you like to condition
-on recording variable characters only (Mkv)?’ Ordinarily when we collect
-morphological data, unlike when we sequence DNA, we don’t typically
-collect non-variable characters. If unaccounted for, this results in a
-form of ascertainment bias. We can account for this using the ‘v’ (=
-variable coding) correction. But for the moment select ‘no’, as this
-correction is more computationally expensive, and BEAST2 and RevBayes
-handle this in different ways.</p>
+<p>To read in your morphological data, go to File &gt; Add Morphological
+Data and navigate to your nexus file. (Note I think there’s a bug that
+prevents you dragging and dropping the data file into to BEAUTi 2.7, at
+least on my Mac.)</p>
+<p>This will bring up a box that says, ‘Would you like to condition on
+recording variable characters only (Mkv)?’ Ordinarily when we collect
+morphological data, unlike when we collect DNA sequences, we don’t
+typically collect non-variable characters. If unaccounted for, this
+results in a form of ascertainment bias. We can account for this using
+the ‘v’ (= variable coding) correction. But for the moment select ‘no’,
+as this correction is more computationally expensive, and BEAST2 and
+RevBayes handle this in different ways.</p>
 <p>If you successfully imported the data, your window should look like
 this.</p>
 <p><img src="beauti-01.png" width="80%" style="padding:10px" /></p>
@@ -352,7 +352,7 @@ You might have noticed that the names in the nexus file are appended by
 a number. This is the age information associated with each species.
 BEAUti can parse this information.</p>
 <p>Select Auto-configure and then <code>use everything</code> &gt; after
-last <code>_</code>. Back in the main window also make sure to select
+last <code>_</code>. Back in the main window make sure to select
 <code>Before the present</code> from the drop down menu.
 <code>Since some time in the past</code> is used more commonly for
 viruses or bacteria.</p>
@@ -415,15 +415,15 @@ sampling proportion option. We’re also fixing Rho. You can leave this as
 priors. These are presented below the tree model toggle in alphabetical
 order. I’ll go through them in the following order: substitution model,
 clock model, FBD model. Remember that it’s bad practice to stick with
-the default priors, unless you have good reason to.</p>
+the default priors without, unless you have good reason to.</p>
 <p>First let’s deal with the prior on the shape parameter of the Gamma
 sites model. For this we’ll use an exponential distribution with a mean
 of = 1.</p>
 <p><img src="beauti-04.png" width="80%" style="padding:10px" /></p>
 <p>Select the clock rate. The default prior on this is a uniform
 distribution between 0 and infinity - this is obviously not a good prior
-for this parameter! Let’s use an exponential prior with a mean of
-0.1.</p>
+for this parameter! Let’s use an exponential prior with a mean of 0.01,
+since rates of morphological evolution tend to be low.</p>
 <p><img src="beauti-05.png" width="80%" style="padding:10px" /></p>
 <p>Next we’ll define all the priors of the FBD model parameters,
 starting with the diversification rate. Let’s use a gamma prior for this
@@ -438,13 +438,14 @@ distribution between 0 and 1 is a reasonable choice, in the absence of
 other information about these parameter values. We’ll leave these as
 they are.</p>
 <p><img src="beauti-07.png" width="80%" style="padding:10px" /></p>
-<p>Now we’ll specify a prior on the origin time parameter. We’ll use the
-oldest bear fossil as a minimum (= 35.0) and a recent estimate for the
-age of carnivores as a maximum (= 55.0). We also need to ensure the
-starting value for the origin is within these bounds. This is currently
-set to 100, in the box that says <code>initial = [100.0]</code>. Change
-it to something like 40, so it doesn’t violate fall outside the minimum
-and maximum values.</p>
+<p>Now we’ll specify a uniform prior on the origin time parameter. We’ll
+use the oldest bear fossil as a minimum (= 35.0) and a recent estimate
+for the age of carnivores as a maximum (= 55.0). We also need to ensure
+the starting value for the origin is within these bounds. This is
+currently set to 100, in the box that says
+<code>initial = [100.0]</code>. Change it to something like 40, so it
+doesn’t fall outside the minimum and maximum values and fail to
+initialise.</p>
 <p><img src="beauti-07b.png" width="80%" style="padding:10px" /></p>
 <p>Finally, we’ll create a clade constraint to monitor the age of all
 living bears. Click <code>+ Add Prior</code> and select MRCA (= most
@@ -514,9 +515,9 @@ the <code>Target tree type</code> menu leave the default Maxmimum clade
 credibility (MCC) tree option and from the Node heights menu select
 <code>Keep target heights</code> (this is because a posterior with lots
 of uncertainty, which is expected when we have a small morphological
-matrix, can result in negative branch length is we choose median node
-ages). Next select your <code>.trees</code> file as the input and create
-a file name for your output (e.g.,
+matrix, can result in negative branch length if we choose median node
+ages). Next select your <code>.trees</code> file as the Input Tree File
+and create a file name for your output (e.g.,
 <code>bears_morphology_MCC.tre</code>).</p>
 <p><img src="treeAnn.png" width="60%" style="padding:10px" /></p>
 <p>Once you have your summary tree open it in FigTree and play around
@@ -527,26 +528,9 @@ this.</p>
 <p>Which candiates on your tree do you think might be sampled
 ancestors?</p>
 </blockquote>
-<blockquote>
-<p>Play around with the HPD intervals using the Node Labels menu. Do you
-notice any a bit odd?</p>
-</blockquote>
 </div>
 <div id="next" class="section level2">
 <h2>Next tasks</h2>
-<div id="add-molecular-sequence-data" class="section level3">
-<h3>Add molecular sequence data</h3>
-<p>Try adding the molecular sequence alignment that complements this
-dataset. This is an alignment with 1000 sites of the mitochondrial gene
-cytochrome oxidase B for 10 living species.</p>
-<p>Note there’s a bug in BEAUti v2.6 that makes it tricky to set up
-different partitions, so you can use a precooked xml for this purpose.
-You can download this <a href="bears_morpho_cytb.xml">here</a> and get
-it running in BEAST.</p>
-<blockquote>
-<p>What differences do you notice in your output?</p>
-</blockquote>
-</div>
 <div id="running-the-analysis-under-the-fbd-model-only"
 class="section level3">
 <h3>Running the analysis under the FBD model only</h3>
@@ -555,6 +539,24 @@ back in BEAUti. At the bottom of this panel you should see a check box
 next to <code>Sample From Prior</code>. Select this option, change your
 output file names and export a new xml. Run this in BEAST2 as
 before.</p>
+<blockquote>
+<p>Do you notice any differences in the output? In the event you
+<em>don’t</em> observe a large difference in the output, how would you
+interpret this?</p>
+</blockquote>
+</div>
+<div id="add-molecular-sequence-data" class="section level3">
+<h3>Add molecular sequence data</h3>
+<p>Let’s try repeating this analysis with molecular sequence data. We
+have an alignment with 2 genes (cytb and irbp) for 10 living bear
+species.</p>
+<p>Unfortunately there’s currently a bug in BEAUti that makes it tricky
+to link the tree across partitions, so we will use precooked output from
+an analysis of the molecular data only for this part of the tutorial.
+You can download this <a href="data/pre_cooked.zip">here</a>.</p>
+<blockquote>
+<p>What differences do you notice in your output?</p>
+</blockquote>
 </div>
 </div>
 </div>

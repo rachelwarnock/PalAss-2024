@@ -27,7 +27,7 @@ For this exercise create a folder called `FBD_exercise_BEAST2` (or whatever you 
 
 #### Software
 
-Download the software [BEAST2 v2.6 or above](https://www.beast2.org), [Tracer v1.7](https://beast.community/tracer) and [FigTree](https://beast.community/figtree) if you haven't done so already.
+Download the software [BEAST2 v2.7](https://www.beast2.org), [Tracer v1.7](https://beast.community/tracer) and [FigTree](https://beast.community/figtree) if you haven't done so already. This tutorial uses RevBayes 1.2.3.
 
 BEAST2 uses an `xml` file as input, containing all the model specifications, including prior parameters and MCMC settings. You can create the `xml` file using the BEAST2 accessory program BEAUti.
 
@@ -39,15 +39,13 @@ For the analysis in this tutorial we need to install the `SA` and `MM` packages,
 
 Open BEAUTi go to File > Manage Packages, scroll down, select the `SA` and `MM` packages and hit Install at the bottom. This should bring up a confirmation message.
 
-Restart BEAUTi and we can begin setting up the analysis.
+**Restart BEAUTi** and we can begin setting up the analysis.
 
 ## Reading the data {#read}
 
-To read in your data, simply drag your nexus file into the Partitions panel. Or go to File > Import Alignment and navigate to your nexus file.
+To read in your morphological data, go to File > Add Morphological Data and navigate to your nexus file. (Note I think there's a bug that prevents you dragging and dropping the data file into to BEAUTi 2.7, at least on my Mac.)
 
-This will bring up a box that asks you to clarify what type of data you have. Select Add Morphological Data. 
-
-This will then bring up a box that says, 'Would you like to condition on recording variable characters only (Mkv)?' Ordinarily when we collect morphological data, unlike when we sequence DNA, we don't typically collect non-variable characters. If unaccounted for, this results in a form of ascertainment bias. We can account for this using the 'v' (= variable coding) correction.
+This will bring up a box that says, 'Would you like to condition on recording variable characters only (Mkv)?' Ordinarily when we collect morphological data, unlike when we collect DNA sequences, we don't typically collect non-variable characters. If unaccounted for, this results in a form of ascertainment bias. We can account for this using the 'v' (= variable coding) correction.
 But for the moment select 'no', as this correction is more computationally expensive, and BEAST2 and RevBayes handle this in different ways.
 
 If you successfully imported the data, your window should look like this.
@@ -60,7 +58,7 @@ knitr::include_graphics("beauti-01.png")
 
 Move on to the Tip Dates panel and select `Use tip dates`. You might have noticed that the names in the nexus file are appended by a number. This is the age information associated with each species. BEAUti can parse this information.
 
-Select Auto-configure and then `use everything` > after last `_`. Back in the main window also make sure to select `Before the present` from the drop down menu. `Since some time in the past` is used more commonly for viruses or bacteria. 
+Select Auto-configure and then `use everything` > after last `_`. Back in the main window make sure to select `Before the present` from the drop down menu. `Since some time in the past` is used more commonly for viruses or bacteria. 
 
 ## The tripartite model
 
@@ -111,7 +109,7 @@ We'll leave all the default options as they are right now. Under this set up, we
 knitr::include_graphics("beauti-03.png")
 ```
 
-Now we've set up the tree model, let's move onto set up all the other priors. These are presented below the tree model toggle in alphabetical order. I'll go through them in the following order: substitution model, clock model, FBD model. Remember that it's bad practice to stick with the default priors, unless you have good reason to.
+Now we've set up the tree model, let's move onto set up all the other priors. These are presented below the tree model toggle in alphabetical order. I'll go through them in the following order: substitution model, clock model, FBD model. Remember that it's bad practice to stick with the default priors without, unless you have good reason to.
 
 First let's deal with the prior on the shape parameter of the Gamma sites model. For this we'll use an exponential distribution with a mean of = 1.
 
@@ -119,7 +117,7 @@ First let's deal with the prior on the shape parameter of the Gamma sites model.
 knitr::include_graphics("beauti-04.png")
 ```
 
-Select the clock rate. The default prior on this is a uniform distribution between 0 and infinity - this is obviously not a good prior for this parameter! Let's use an exponential prior with a mean of 0.1.
+Select the clock rate. The default prior on this is a uniform distribution between 0 and infinity - this is obviously not a good prior for this parameter! Let's use an exponential prior with a mean of 0.01, since rates of morphological evolution tend to be low.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
 knitr::include_graphics("beauti-05.png")
@@ -137,9 +135,9 @@ Then let's look at the sampling proportion and turnover parameters. These both l
 knitr::include_graphics("beauti-07.png")
 ```
 
-Now we'll specify a prior on the origin time parameter. 
+Now we'll specify a uniform prior on the origin time parameter.
 We'll use the oldest bear fossil as a minimum (= 35.0) and a recent estimate for the age of carnivores as a maximum (= 55.0). We also need to ensure the starting value for the origin is within these bounds.
-This is currently set to 100, in the box that says `initial = [100.0]`. Change it to something like 40, so it doesn't violate fall outside the minimum and maximum values.
+This is currently set to 100, in the box that says `initial = [100.0]`. Change it to something like 40, so it doesn't fall outside the minimum and maximum values and fail to initialise.
 
 ```{r, echo=FALSE, out.width="80%",  out.extra='style="padding:10px"'}
 knitr::include_graphics("beauti-07b.png")
@@ -195,7 +193,7 @@ knitr::include_graphics("trace-beast.png")
 ## Processing the trees files
 
 Next let's generate a summary tree. BEAST has another accessory program called TreeAnnotator. Open this up. 
-Add a burnin of 10%. From the `Target tree type` menu leave the default Maxmimum clade credibility (MCC) tree option and from the Node heights menu select `Keep target heights` (this is because a posterior with lots of uncertainty, which is expected when we have a small morphological matrix, can result in negative branch length is we choose median node ages). Next select your `.trees` file as the input and create a file name for your output (e.g., `bears_morphology_MCC.tre`). 
+Add a burnin of 10%. From the `Target tree type` menu leave the default Maxmimum clade credibility (MCC) tree option and from the Node heights menu select `Keep target heights` (this is because a posterior with lots of uncertainty, which is expected when we have a small morphological matrix, can result in negative branch length if we choose median node ages). Next select your `.trees` file as the Input Tree File and create a file name for your output (e.g., `bears_morphology_MCC.tre`).
 
 ```{r, echo=FALSE, out.width="60%",  out.extra='style="padding:10px"'}
 knitr::include_graphics("treeAnn.png")
@@ -210,26 +208,37 @@ knitr::include_graphics("mcc_bears_fbd_beast.png")
 
 > Which candiates on your tree do you think might be sampled ancestors?
 
-> Play around with the HPD intervals using the Node Labels menu. Do you notice any a bit odd?
-
 ## Next tasks {#next}
-
-### Add molecular sequence data
-
-Try adding the molecular sequence alignment that complements this dataset.
-This is an alignment with 1000 sites of the mitochondrial gene cytochrome oxidase B for 10 living species. 
-
-Note there's a bug in BEAUti v2.6 that makes it tricky to set up different partitions, so you can use a precooked xml for this purpose. You can download this [here](bears_morpho_cytb.xml) and get it running in BEAST.
-
-> What differences do you notice in your output?
-
 
 ### Running the analysis under the FBD model only
 
 To run the analysis "under the prior", navigate to the MCMC panel back in BEAUti. At the bottom of this panel you should see a check box next to `Sample From Prior`. Select this option, change your output file names and export a new xml. Run this in BEAST2 as before.
 
 ```{r hidden_notes, eval=FALSE, echo=FALSE}
-#TODO: double check all the figs associated with this tutorial
 #TODO: Accounting for fossil age uncertainty
 ```
+
+> Do you notice any differences in the output? In the event you *don't* observe a large difference in the output, how would you interpret this?
+
+### Add molecular sequence data
+
+```{r notes, eval=FALSE, echo=FALSE}
+
+#Back in BEAUTi go to File > Import Alignment and select your alignment. Now you will see two sets of data in your Partitions panel.
+
+#We have already specified the tip ages, so we don't need to do this again. 
+
+#Navigate to the Site Model panel, select your molecular partition and set up whatever substitution model you like (e.g., I chose GTR+G).
+
+#In the Clock Model panel, let's select a relaxed clock model. Select `Optimised Relaxed Clock` from the drop down menu.
+
+##The MCMC set up is very similar to before. 
+```
+
+Let's try repeating this analysis with molecular sequence data.
+We have an alignment with 2 genes (cytb and irbp) for 10 living bear species.
+
+Unfortunately there's currently a bug in BEAUti that makes it tricky to link the tree across partitions, so we will use precooked output from an analysis of the molecular data only for this part of the tutorial. You can download this [here](data/pre_cooked.zip).
+
+> What differences do you notice in your output?
 
