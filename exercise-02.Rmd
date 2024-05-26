@@ -167,7 +167,7 @@ knitr::include_graphics("beauti-09.png")
 ## Exporting the xml
 
 To create the input file for BEAST2 we need to export the `xml` file.
-Simply go to File > Save As and navigate to where you want to save the file on your computer.
+Simply go to File > Save As and navigate to where you want to save the file on your computer. Have a look at this file in a text editor.
 
 Leave BEAUti open for now. If you have time, you can come back and set up more analyses using the molecular data. 
 
