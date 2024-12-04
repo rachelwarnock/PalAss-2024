@@ -1,41 +1,57 @@
 ---
-title: "Bayesian divergence time estimation"
+title: "PalAss 2024 Phylogenetics workshop"
 ---
 
-\
 
-# Choose your own adventure
-
-These exercises focus on the use of the fossilised birth-death (FBD) process for Bayesian divergence time estimation using a dataset of living and extinct bears.
-
-1. Dating [exercise](exercise-01.html) using [RevBayes](https://revbayes.github.io) 
-2. Dating [exercise](exercise-02.html) using [BEAST2](https://www.beast2.org/)
-
-You will also need to install the software [Tracer](http://beast.community/tracer) and [FigTree](https://github.com/rambaut/figtree/releases).
-
-Click on one of the links at the top to begin!
-
-3. You can also use simulations to explore assumptions of the FBD process (and related birth-process models) using the [FossilSim](https://github.com/fossilsim/fossilsim) R package application [FossilSimShiny](https://github.com/fossilsim/FossilSimShiny). Associated exercise available [here](https://phylogenetics-fau.netlify.app/fossilsimshiny).
-
-```{r, echo=FALSE, out.width="50%",  out.extra='style="float:right; padding:30px"'}
-knitr::include_graphics("bear.jpg")
+```{r, echo=FALSE, out.width="50%",  out.extra='style="float:right; padding:40px"'}
+# https://www.behance.net/gallery/47366833/Pretzel-Tree
+knitr::include_graphics("pretzel-tree.png")
 ```
 
-# Additional resources
+Welcome to the [Palaeontological Association Annual Meeting](https://www.palass.org/meetings-events/annual-meeting/2024/annual-meeting-2024-erlangen-germany-overview) in Erlangen and to the *Fossil sampling biases and phylogenetics* workshop!
 
-The above exercises are adapted from tutorials written by Tracy Heath, Joëlle Barido-Sottani and co-authors. 
+The workshop will take place on **Tuesday 10.12.24 9:00–12:30** in the seminar room on the ground floor of the main [FAU University Library](https://maps.app.goo.gl/XwGjd29gxTPEPmfp6) (just 10 minutes from the station).
 
-Extended versions of both tutorials can be found on the [Taming the Beast site](https://taming-the-beast.org/tutorials/FBD-tutorial/) and the [RevBayes tutorial page](https://revbayes.github.io/tutorials/).
+There are no fees associated with this workshop. You just need to come along with your laptop!
 
-The morphology only analysis was originally published [here](https://hal.inria.fr/PGE/hal-02536394).
+Instructors: Bethany Allen (ETHZ), Laura Mulvey (FAU), Rachel Warnock (FAU), Joëlle Barido-Sottani (ENS), Tim Brandler (FAU), Alessio Capobianco (LMU), Robert Haobo Yuan (ETHZ)
 
+# Before the workshop
 
-# Any questions?
+## Software
+
+Ahead of the workshop please install the following software:
+
+- [RevBayes (v 1.2.4)](https://revbayes.github.io/download)
+- [Tracer](https://github.com/beast-dev/tracer/releases/tag/v1.7.2)
+- [FigTree](http://tree.bio.ed.ac.uk/software/figtree/)
+- [R](https://www.r-project.org)
+
+If you encounter any installation issues, please get in touch beforehand - describe the issue and provide details of the computer and operating system you're using.
+
+## Recommended reading
+
+- [*Understanding the tripartite approach to Bayesian divergence time estimation*](https://ecoevorxiv.org/repository/view/4372/) Warnock & Wright, 2020
+- [*Total-evidence dating and the fossilized birth–death model*](https://academic.oup.com/sysbio/article/65/2/228/2427164) Gavryushkina & Zhang, 2021
+- [*Assessing the effect of time-scaling methods on phylogeny-based analyses in the fossil record*](https://www.cambridge.org/core/journals/paleobiology/article/assessing-the-effect-of-timescaling-methods-on-phylogenybased-analyses-in-the-fossil-record/082F239A2512CC09E51181F9B499D1A3) Bapst, 2016
+
+PDFs available here: https://tinyurl.com/ycy9bjka 
+
+## Recommended videos
+
+We also recommend the Paul Lewis Phyloseminar leture series (especially parts 1, 2, and 3a). These provide a really great intro to some of the theory we'll be covering.
+
+- [Phyloenetics primer part 1](https://www.youtube.com/watch?v=1r4z0YJq580)
+- [Phyloenetics primer part 2](https://www.youtube.com/watch?v=UsLeY0wZr4Y&t=1614s)
+- [Phyloenetics primer part 3a](https://www.youtube.com/watch?v=4PWlnNsfz90)
+- [Phyloenetics primer part 3b](https://www.youtube.com/watch?v=TLtOS--YwkU)
+
+## Any questions?
 
 Email rachel.warnock@fau.de
 
 \
 \
 
-Image source: upsplash
+Image source: Cathy Wu via behance.net
 

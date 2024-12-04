@@ -11,7 +11,7 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "RevBayes exercise"
-      href: exercise-01.html
-    - text: "BEAST2 exercise"
-      href: exercise-02.html
+    - text: "Schedule"
+      href: schedule.html
+    - text: "Resources"
+      href: resources.html
