@@ -52,7 +52,7 @@ kbl(dt) %>%
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("", "")
+urls <- c("", "ModelAdequacy.html")
 
 dt <- data.frame(links = c("Slides", 
                               "Exercise 2"),

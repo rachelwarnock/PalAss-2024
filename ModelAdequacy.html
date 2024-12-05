@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>ModelAdequacy.knit</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="schedule.html">Schedule</a>
+</li>
+<li>
+  <a href="resources.html">Resources</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<p><br />
+</p>
+<div id="model-adequacy-using-posterior-predictive-simulations"
+class="section level1">
+<h1>Model adequacy using posterior predictive simulations</h1>
+<p>In this exercise we will test the adequacy of morphological models
+using posterior predictive simulations. We will use the same data set as
+in the previous tutorial which can be downloaded <a
+href="data/Egi.nex">here</a>.</p>
+<p>In the previous exercise we applied the Mk model to this data set.
+Here we can test extensions to the standard Mk model to determine,
+which, if any of them, are adequate for our data set. The general set up
+of the analysis script will be similar to the other tutorial, so we will
+not provide as much of an explanation on certain parts of the set up
+here. The main sections you should focus on is how you modify the
+morphological models.</p>
+<p>Below I provide code for different elements of morphological
+models:</p>
+<ul>
+<li>Ascertainment bias correction</li>
+<li>Among-character rate variation (Gamma)</li>
+<li>Loop for partition the character data</li>
+</ul>
+<p>You can decide how you want to build you models following this
+code!</p>
+<div id="how-to-organise-your-code" class="section level2">
+<h2>How to organise your code</h2>
+<p>Set up a new directory for this tutorial with separate directories
+for the data and the scripts. In this tutorial you should make (at
+least) 4 rev scripts. One for the first step of PPS
+<code>PPS_inference.rev</code> , one for the second step, where the data
+is simulated, <code>PPS_simulations.rev"</code>, “and two files for your
+two morphological models.</p>
+</div>
+<div id="posterior-predictive-simulations-part-1-inference"
+class="section level2">
+<h2>Posterior predictive simulations: Part 1 Inference</h2>
+<p>Much of the following code is identical to that use for a standard
+MCMC. We specify that we want to use a sample the marginal likelihood
+but the model set up is the exact same as in the previous tutorials.</p>
+<p>In the <code>PPS_inference.rev</code>script we first need to read in
+our morphological data</p>
+<pre class="r"><code>morpho &lt;- readDiscreteCharacterData(&quot;data/Egi.nex&quot;)</code></pre>
+<p>Define some helper variables</p>
+<pre class="r"><code>model_name = &quot;Mk&quot; # or whatever model you are testing
+analysis_name = &quot;Palass_2024&quot;
+taxa &lt;- morpho.names()
+num_taxa &lt;- taxa.size()
+num_branches &lt;- 2 * num_taxa - 3</code></pre>
+<blockquote>
+<p>When testing different models it can be helpful to create a variable
+named <code>model</code> at the start. This can be used to name the
+output files and means you don’t have to manually change the name
+everytime you want to run a different model and prevents overwriting the
+output of previous models.</p>
+</blockquote>
+<p>Create vectors for our moves and monitors</p>
+<pre class="r"><code>moves = VectorMoves()
+monitors = VectorMonitors()</code></pre>
+<div id="tree-model" class="section level6">
+<h6>Tree model</h6>
+<p>Set up the prior for the branch lengths</p>
+<pre class="r"><code>br_len_lambda ~ dnExp(0.2)
+moves.append(mvScale(br_len_lambda, weight=2))</code></pre>
+<p>We then set a uniform tree prior for the tree topology. This prior
+assumes that no tree is more likely <em>a priori</em> than any
+other.</p>
+<pre class="r"><code># uniform prior on branch lengths
+phylogeny ~ dnUniformTopologyBranchLength(taxa, branchLengthDistribution=dnExponential(br_len_lambda))
+moves.append(mvNNI(phylogeny, weight=num_branches/2.0))
+moves.append(mvSPR(phylogeny, weight=num_branches/10.0))
+moves.append(mvBranchLengthScale(phylogeny, weight=num_branches))
+
+## we often want to keep track of the tree length during the anaylsis
+tree_length := phylogeny.treeLength()</code></pre>
+</div>
+</div>
+<div id="setting-up-the-morphological-models" class="section level2">
+<h2>Setting up the morphological models</h2>
+<p>Here you can choose any combination of model you want to test -
+between partitioned, unpartitioned, ACRV, and correcting for
+ascertainment bias.</p>
+<p>To set up an Mk model you use the JC function in
+<code>revbayes</code> as this has the same set of assumptions. Our data
+set has 5 characters so we create a Q-matrix size 5. This number will
+depend on the data used so will need to be manually changed if using
+this script for different data sets. In the Egi data set used here there
+at 5 character states so we can add this as follows:</p>
+<p>Note: You can combine the different extensions into one morphological
+model but just ensure you <strong>only define the dnPhyloCTMC object
+once</strong>. The following code shows how to construct an Mk, MkV,
+Mk+G and an MkP model but you can use it to combine different elements
+to make for example an MkV+G model.</p>
+<div id="mk" class="section level5">
+<h5>Mk:</h5>
+<p>An unpartitioned Mk model can be defined by</p>
+<pre class="r"><code>## define our Q matrix
+Q &lt;- fnJC(5)
+
+## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type=&quot;Standard&quot;)
+seq.clamp(morpho)</code></pre>
+</div>
+<div id="mkv" class="section level5">
+<h5>MkV:</h5>
+<p>To account for accertainment bias we need to tell the model we are
+conditioning on all sites being variable. To do this we add to the
+phyloCTMC object as follows</p>
+<pre class="r"><code>## define our Q matrix
+Q &lt;- fnJC(5)
+
+## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type=&quot;Standard&quot;, coding = &quot;variable&quot;)
+seq.clamp(morpho)</code></pre>
+</div>
+<div id="mkg" class="section level5">
+<h5>Mk+G:</h5>
+<p>To estimate ACRV*we first need to set up a prior on our alpha (or
+shape) parameter</p>
+<pre class="r"><code>## define our Q matrix
+Q &lt;- fnJC(5)
+# Set up Gamma-distributed rate variation.
+alpha_morpho ~ dnUniform( 0.0, 1E5 )
+rates_morpho := fnDiscretizeGamma( alpha_morpho, alpha_morpho, 4 ) 
+
+# Moves on the parameters to the Gamma distribution.
+moves.append(mvScale(alpha_morpho, lambda=1, weight=2.0))</code></pre>
+<p>We then need to add this to our phyloCTMC object by specifiying the
+<code>siteRates</code></p>
+<pre class="r"><code>## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type=&quot;Standard&quot;, siteRates=rates_morpho)
+seq.clamp(morpho)</code></pre>
+</div>
+<div id="mkp" class="section level5">
+<h5>MkP:</h5>
+<p>For a partitioned Mk model we can use a loop to go through the
+alignment and create partitions based on the maximum observed state.</p>
+<pre class="r"><code>n_max_states &lt;- 5
+idx = 1
+morpho_bystate[1] &lt;- morpho
+for (i in 2:n_max_states) {
+    morpho_bystate[i] &lt;- morpho                                # make local tmp copy of data
+    morpho_bystate[i].setNumStatesPartition(i)                 # only keep character blocks with state space equal to size i
+    nc = morpho_bystate[i].nchar()                             # get number of characters per character size with i-sized states
+
+    if (nc &gt; 0) {                                              # for non-empty character blocks
+        q[idx] &lt;- fnJC(i)                                      # make i-by-i rate matrix
+        m_morph[idx] ~ dnPhyloCTMC( tree=phylogeny,
+                                    Q=q[idx],
+                                    nSites=nc,
+                                    type=&quot;Standard&quot; )           # create model of evolution for the character block
+
+        m_morph[idx].clamp(morpho_bystate[i])                  # attach the data
+
+        idx = idx + 1                                          # increment counter
+        #idx
+    }
+}</code></pre>
+<blockquote>
+<p>This loop can look a bit confusing but it is just creating a
+phyloCTMC object for each partition. The same way we created one
+phyloCTMC for the unpartitioned data</p>
+</blockquote>
+<p>You can add variable coding and ACRV to the phyloCTMC object the same
+as for the unpartitioned model.</p>
+</div>
+<div id="back-to-the-pps-set-up" class="section level3">
+<h3>Back to the PPS set up</h3>
+<p>We want to use the model we just made in a seperate file in this
+analysis so we can source that script using:</p>
+<pre class="r"><code>source(&quot;scripts/&quot; + model_name + &quot;.rev&quot;)</code></pre>
+<p>Note: In order for that command to work ensure that the file you made
+has the same name you used to define <code>model_name</code> as
+above</p>
+<p>We can now define out model object</p>
+<pre class="r"><code>## define the model
+mymodel = model(phylogeny)</code></pre>
+<p>We can now define our monitors. For this analysis we add a different
+file than the normal set up, the <code>.var file</code>. This file will
+be used in the next step to simulate the new data sets.</p>
+<pre class="r"><code>monitors.append( mnModel(filename=&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_posterior.log&quot;,printgen=10, separator = TAB))
+monitors.append( mnFile(filename=&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_posterior.trees&quot;,printgen=10, separator = TAB, phylogeny) )
+monitors.append( mnScreen(printgen=1000, tree_length) )
+monitors.append( mnStochasticVariable(filename=&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_posterior.var&quot;,printgen=10) )</code></pre>
+<p>Now that we have our model, moves, and monitors set up we can define
+our MCMC. This is done using the <code>mcmc()</code> function.
+<code>nruns</code> specifiies that there are two independent mcmc runs
+during the analysis.</p>
+<pre class="r"><code>mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine=&quot;mixed&quot;)
+mymcmc.burnin(generations=200,tuningInterval=200)</code></pre>
+<p>To start the MCMC then run the following command</p>
+<pre class="r"><code>mymcmc.run(generations=10000,tuningInterval=200)</code></pre>
+<p>Once the analysis is finished you can generate a most credible clade
+summary tree using the <code>mccTree()</code> function. We will need to
+use this tree when calculating the test statistics.</p>
+<pre class="r"><code>trace = readTreeTrace(&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_posterior.trees&quot;)
+mccTree(trace, file=&quot;output_&quot; + model_name + &quot;/MCC.tre&quot;)</code></pre>
+<p>Be sure to clsoe <code>RevBayes</code> between steps to ensure you
+have a clean working environment. Alternatively you can use the
+<code>clear()</code> command.</p>
+</div>
+</div>
+</div>
+<div id="posterior-predictive-simulations-part-2-simulations"
+class="section level1">
+<h1>Posterior predictive simulations: Part 2 Simulations</h1>
+<p>Now that we have run an MCMC inference we can now use the parameters
+sampled during the inference to simulate new data sets. If the model
+able to capture the evolutionary dynamics of our data set, we should be
+able to simulate data sets with similar properties.</p>
+<p>The easiest thing to do now is to copy the file you made for the last
+analysis and rename it <code>PPS_simulations.rev</code>, (or as you
+want). From here you can delete all the arguments after
+<code>mymodel = model(phylogeny)</code>. As we are not doing an MCMC in
+this step we do not require any of the other information. We now need to
+add the commands for simulating data in <code>Revbayes</code>.</p>
+<p>First we read in the trace file created during the previous MCMC.</p>
+<pre class="r"><code>trace = readStochasticVariableTrace(&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_posterior.var&quot;, delimiter=TAB)</code></pre>
+<p>Now we use the <code>posteriorPredictiveSimulation()</code> function
+to set up the simulations. We provide the function with the model,
+output directory, and the trace file.</p>
+<pre class="r"><code>pps = posteriorPredictiveSimulation(mymodel, directory=&quot;output_&quot; + model_name + &quot;/&quot; + analysis_name + &quot;_post_sims&quot;, trace)</code></pre>
+<p>To start the simulation we use the <code>pps.run()</code> function.
+Here we can specify how many data sets we want to simulate by setting
+the thinning. The .var file contains a number of phylogenetic trees. If
+thinning is set to the default (0) the pps.run() function will simulate
+data for each tree. Setting thinning to 2 will simulate along every
+second tree and so on. In this way setting thinning = 2 simulates data
+for half of the trees in the .var file. Simulating 500 data sets has
+been found to be sufficient for these types of analysis. If you increase
+the number of iterations in the MCMC you may want to increase the
+thinning value here. Here we set thinning to 4.</p>
+<pre class="r"><code>pps.run(thinning=4)</code></pre>
+<p>Once you run this command a directory should be created in the
+output_Mk directory called pps_morpho_example_post_sims. This is where
+all of the data simulated in <code>revbayes</code> will be stored. This
+simulation step should only take a few minutes.</p>
+</div>
+<div
+id="posterior-predictive-simulations-part-3-calculating-the-test-statistics"
+class="section level1">
+<h1>Posterior predictive simulations: Part 3 Calculating the test
+statistics</h1>
+<p>The R script for this section can be downloaded <a
+href="scripts/test-stats.r">here</a> To determine if a model is adequate
+or not we need to compare the empirical data with the newly simulated
+data sets. If the simulated data sets are not significantly different
+from the empirical, we can conclude that the model is adequate for the
+data set. Here we use two test statistics, Consistency Index and
+Retention Index. Consistency Index is a measure of homoplasy in the data
+and retention index measures the degree to which potential synapomorphy
+is exhibited on the tree. These test statistics are calculated in R
+using the Test-stats.r script.</p>
+<p>This script calculates posterior P-values and effect sizes to
+determine the adequacy of the model. Here we calculate 4 p-values, lower
+1-tailed, Upper 1-tailed, 2-tailed, and the mid-point p-value. Values of
+less than 0.025 or greater the 0.975 indicate significance. The effect
+sizes can also be used to determine the adequacy of a model, though the
+p-values are considered more conservative. For the effect sizes, if the
+maximum and minimum value range through zero a model can be considered
+adequate.</p>
+<p>If can open up the <code>test-stats.R</code>file in R studio. You
+need to make sure that the model you specified is the model you ran the
+analysis under. You will not need to change anything else in the script
+to run it.</p>
+<pre class="r"><code>model &lt;- &quot;Mk&quot;
+dataset &lt;- &quot;Egi.nex&quot;
+analysis_name &lt;- &quot;Palass_2024&quot;</code></pre>
+<p>A complete set of scripts for this exercise can be downloaded <a
+href="scripts/modeladequacy-scripts.zip">here</a>.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

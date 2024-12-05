@@ -1,0 +1,280 @@
+---
+title: ''
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\
+
+
+# Model adequacy using posterior predictive simulations
+
+
+In this exercise we will test the adequacy of morphological models using
+posterior predictive simulations. We will use the same data set as in
+the previous tutorial which can be downloaded [here](data/Egi.nex).
+
+
+In the previous exercise we applied the Mk model to this data set. Here we can test
+extensions to the standard Mk model to determine, which, if any of them, are adequate for our data set. The general set up of the analysis  script will be similar to the other tutorial, so we will
+not provide as much of an explanation on certain parts of the set up here. The main
+sections you should focus on is how you modify the morphological models.
+
+
+Below I provide code for different elements of morphological models:
+
+- Ascertainment bias correction
+- Among-character rate variation (Gamma)
+- Loop for partition the character data 
+
+
+You can decide how you want to build you models following this code!
+
+
+## How to organise your code
+Set up a new directory for this tutorial with separate directories for the data and the scripts. In this tutorial you should make (at least) 4 rev scripts. One for the first step of PPS  `PPS_inference.rev` , one for the second step, where the data is simulated, `PPS_simulations.rev"`, "and two files for your two morphological models.
+
+
+
+## Posterior predictive simulations: Part 1 Inference
+
+Much of the following code is identical to that use for a standard MCMC. We specify that we want to use a sample the marginal likelihood but the model set up is the exact same as in the previous tutorials. 
+
+In the `PPS_inference.rev`script we first need to read in our morphological data
+
+```{r data, eval=FALSE}
+morpho <- readDiscreteCharacterData("data/Egi.nex")
+```
+
+Define some helper variables
+
+
+```{r var1, eval=FALSE}
+model_name = "Mk" # or whatever model you are testing
+analysis_name = "Palass_2024"
+taxa <- morpho.names()
+num_taxa <- taxa.size()
+num_branches <- 2 * num_taxa - 3
+```
+> When testing different models it can be helpful to create a variable named `model` at the start. This can be used to name the output files and means you don't have to manually change the name everytime you want to run a different model and prevents overwriting the output of previous models.
+
+Create vectors for our moves and monitors
+
+```{r var2, eval=FALSE}
+moves = VectorMoves()
+monitors = VectorMonitors()
+```
+
+
+###### Tree model
+Set up the prior for the branch lengths
+```{r branches, eval=FALSE}
+br_len_lambda ~ dnExp(0.2)
+moves.append(mvScale(br_len_lambda, weight=2))
+```
+
+
+We then set a uniform tree prior for the tree topology. This prior assumes that no tree is more likely _a priori_ than any other.
+ 
+```{r tree, eval=FALSE}
+# uniform prior on branch lengths
+phylogeny ~ dnUniformTopologyBranchLength(taxa, branchLengthDistribution=dnExponential(br_len_lambda))
+moves.append(mvNNI(phylogeny, weight=num_branches/2.0))
+moves.append(mvSPR(phylogeny, weight=num_branches/10.0))
+moves.append(mvBranchLengthScale(phylogeny, weight=num_branches))
+
+## we often want to keep track of the tree length during the anaylsis
+tree_length := phylogeny.treeLength()
+```
+
+## Setting up the morphological models
+Here you can choose any combination of model you want to test - between partitioned, unpartitioned, ACRV, and correcting for ascertainment bias. 
+
+
+To set up an Mk model you use the JC function in `revbayes` as this has the same set of assumptions. Our data set has 5 characters so we create a Q-matrix size 5. This number will depend on the data used so will need to be manually changed if using this script for different data sets. In the Egi data set used here there at 5 character states so we can add this as follows:
+
+Note: You can combine the different extensions into one morphological model but just ensure you **only define the dnPhyloCTMC object once**. The following code shows how to construct an Mk, MkV, Mk+G and an MkP model but you can use it to combine different elements to make for example an MkV+G model.
+
+##### Mk:
+An unpartitioned Mk model can be defined by
+
+```{r mk, eval=FALSE}
+## define our Q matrix
+Q <- fnJC(5)
+
+## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type="Standard")
+seq.clamp(morpho)
+```
+
+##### MkV:
+To account for accertainment bias we need to tell the model we are conditioning on all sites being variable. To do this we add to the phyloCTMC object as follows
+
+```{r mk_model, eval=FALSE}
+## define our Q matrix
+Q <- fnJC(5)
+
+## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type="Standard", coding = "variable")
+seq.clamp(morpho)
+```
+
+##### Mk+G: 
+To estimate ACRV*we first need to set up a prior on our alpha (or shape) parameter
+
+```{r mkv, eval=FALSE}
+## define our Q matrix
+Q <- fnJC(5)
+# Set up Gamma-distributed rate variation.
+alpha_morpho ~ dnUniform( 0.0, 1E5 )
+rates_morpho := fnDiscretizeGamma( alpha_morpho, alpha_morpho, 4 ) 
+
+# Moves on the parameters to the Gamma distribution.
+moves.append(mvScale(alpha_morpho, lambda=1, weight=2.0))
+```
+
+We then need to add this to our phyloCTMC object by specifiying the `siteRates`
+
+```{r mkv_model, eval=FALSE}
+## create phylo object
+seq ~ dnPhyloCTMC(tree=phylogeny, Q=Q, type="Standard", siteRates=rates_morpho)
+seq.clamp(morpho)
+```
+
+##### MkP:
+For a partitioned Mk model we can use a loop to go through the alignment and create partitions based on the maximum observed state.
+
+
+```{r mkp, eval=FALSE}
+
+n_max_states <- 5
+idx = 1
+morpho_bystate[1] <- morpho
+for (i in 2:n_max_states) {
+    morpho_bystate[i] <- morpho                                # make local tmp copy of data
+    morpho_bystate[i].setNumStatesPartition(i)                 # only keep character blocks with state space equal to size i
+    nc = morpho_bystate[i].nchar()                             # get number of characters per character size with i-sized states
+
+    if (nc > 0) {                                              # for non-empty character blocks
+        q[idx] <- fnJC(i)                                      # make i-by-i rate matrix
+        m_morph[idx] ~ dnPhyloCTMC( tree=phylogeny,
+                                    Q=q[idx],
+                                    nSites=nc,
+                                    type="Standard" )           # create model of evolution for the character block
+
+        m_morph[idx].clamp(morpho_bystate[i])                  # attach the data
+
+        idx = idx + 1                                          # increment counter
+        #idx
+    }
+}
+
+```
+> This loop can look a bit confusing but it is just creating a phyloCTMC object for each partition. The same way we created one phyloCTMC for the unpartitioned data
+
+
+You can add variable coding and ACRV to the phyloCTMC object the same as for the unpartitioned model.
+
+### Back to the PPS set up
+
+We want to use the model we just made in a seperate file in this analysis so we can source that script using:
+
+```{r source, eval=FALSE}
+source("scripts/" + model_name + ".rev")
+
+```
+Note: In order for that command to work ensure that the file you made has the same name you used to define `model_name` as above
+
+
+We can now define out model object 
+
+
+```{r mymodel, eval=FALSE}
+## define the model
+mymodel = model(phylogeny)
+```
+
+We can now define our monitors. For this analysis we add a different file than
+the normal set up, the `.var file`. This file will be used in the next
+step to simulate the new data sets.
+
+```{r monitors, eval=FALSE}
+monitors.append( mnModel(filename="output_" + model_name + "/" + analysis_name + "_posterior.log",printgen=10, separator = TAB))
+monitors.append( mnFile(filename="output_" + model_name + "/" + analysis_name + "_posterior.trees",printgen=10, separator = TAB, phylogeny) )
+monitors.append( mnScreen(printgen=1000, tree_length) )
+monitors.append( mnStochasticVariable(filename="output_" + model_name + "/" + analysis_name + "_posterior.var",printgen=10) )
+```
+ 
+Now that we have our model, moves, and monitors set up we can define our MCMC. This is done using the `mcmc()` function. `nruns` specifiies that there are two independent mcmc runs during the analysis.
+
+
+```{r mcmc, eval=FALSE}
+mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine="mixed")
+mymcmc.burnin(generations=200,tuningInterval=200)
+```
+
+
+To start the MCMC then run the following command
+```{r mcmc_run, eval=FALSE}
+mymcmc.run(generations=10000,tuningInterval=200)
+```
+
+
+Once the analysis is finished you can generate a most credible clade summary tree using the `mccTree()` function. We will need to use this tree when calculating the test statistics.
+
+```{r mcctree, eval=FALSE}
+trace = readTreeTrace("output_" + model_name + "/" + analysis_name + "_posterior.trees")
+mccTree(trace, file="output_" + model_name + "/MCC.tre")
+```
+
+
+Be sure to clsoe `RevBayes` between steps to ensure you have a clean working environment. Alternatively you can use the `clear()` command. 
+
+# Posterior predictive simulations: Part 2 Simulations
+
+Now that we have run an MCMC inference we can now use the parameters sampled during the inference to simulate new data sets. If the model able to capture the evolutionary dynamics of our data set, we should be able to simulate data sets with similar properties. 
+
+The easiest thing to do now is to copy the file you made for the last analysis and rename it `PPS_simulations.rev`, (or as you want). From here you can delete all the arguments after `mymodel = model(phylogeny)`. As we are not doing an MCMC in this step we do not require any of the other information. We now need to add the commands for simulating data in `Revbayes`.
+
+First we read in the trace file created during the previous MCMC.
+
+```{r pps, eval = FALSE}
+trace = readStochasticVariableTrace("output_" + model_name + "/" + analysis_name + "_posterior.var", delimiter=TAB)
+```
+
+
+Now we use the `posteriorPredictiveSimulation()` function to set up the simulations. We provide the function with the model, output directory, and the trace file.
+```{r pps2, eval = FALSE}
+pps = posteriorPredictiveSimulation(mymodel, directory="output_" + model_name + "/" + analysis_name + "_post_sims", trace)
+```
+
+
+To start the simulation we use the `pps.run()` function. Here we can specify how many data sets we want to simulate by setting the thinning. The .var file contains a number of phylogenetic trees. If thinning is set to the default (0) the pps.run() function will simulate data for each tree. Setting thinning to 2 will simulate along every second tree and so on. In this way setting thinning = 2 simulates data for half of the trees in the .var file. Simulating 500 data sets has been found to be sufficient for these types of analysis. If you increase the number of iterations in the MCMC you may want to increase the thinning value here. Here we set thinning to 4.
+
+```{r thinning, eval = FALSE}
+pps.run(thinning=4)
+```
+
+
+Once you run this command a directory should be created in the output_Mk directory called pps_morpho_example_post_sims. This is where all of the data simulated in `revbayes` will be stored. This simulation step should only take a few minutes. 
+
+# Posterior predictive simulations: Part 3 Calculating the test statistics
+The R script for this section can be downloaded [here](scripts/test-stats.r). To determine if a model is adequate or not we need to compare the empirical data with the newly simulated data sets. If the simulated data sets are not significantly different from the empirical, we can conclude that the model is adequate for the data set. Here we use two test statistics, Consistency Index and Retention Index. Consistency Index is a measure of homoplasy in the data and retention index measures the degree to which potential synapomorphy is exhibited on the tree. These test statistics are calculated in R using the Test-stats.r script.
+
+This script calculates posterior P-values and effect sizes to determine the adequacy of the model. Here we calculate 4 p-values, lower 1-tailed, Upper 1-tailed, 2-tailed, and the mid-point p-value. Values of less than 0.025 or greater the 0.975 indicate significance. The effect sizes can also be used to determine the adequacy of a model, though the p-values are considered more conservative. For the effect sizes, if the maximum and minimum value range through zero a model can be considered adequate.
+
+If can open up the `test-stats.R`file in R studio. You need to make sure that the model you specified is the model you ran the analysis under. You will not need to change anything else in the script to run it. 
+
+```{r test-stats, eval = FALSE}
+model <- "Mk"
+dataset <- "Egi.nex"
+analysis_name <- "Palass_2024"
+```
+
+
+
+A complete set of scripts for this exercise can be downloaded [here](scripts/modeladequacy-scripts.zip).
+
