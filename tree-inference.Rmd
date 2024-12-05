@@ -11,9 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Bayesian tree inference using RevBayes
 
-In this exercise we'll estimate a tree of terror birds ([*Brontornis*](https://de.wikipedia.org/wiki/Brontornis)) using morphological character data. The matrix is from [Agnolin et al.  2007](http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333) and consists of 12 taxa and 51 characters $-$ you can download this [here](data/Agnolin.nex).  
+In this exercise we'll estimate a tree of hyaenodonts ([Hyaenodonta](https://en.wikipedia.org/wiki/Hyaenodonta)) using morphological character data. The matrix is from [Egi et al.  2007](http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333) and consists of 12 taxa and 65 characters $-$ you can download this [here](data/Egi.nex).  
 
-We'll be using a Bayesian approach and a simple model of character evolution, the Mk model. 
+We'll be using a Bayesian approach and a simple model of character evolution, the Mk model.
 
 # Software
 
@@ -69,32 +69,32 @@ Can someone with experience on windows add a blurb here?
 ## The Rev langauge
 
 RevBayes uses its own language, which has a lot in common with the R programming language. 
-One of the main differences is that it includes an explicit set of commands and operators for setting up hierarchical or graphical models. You can learn more about and explore the Rev language [here]().
+One of the main differences is that it includes an explicit set of commands and operators for setting up hierarchical or graphical models. You can learn more about and explore the Rev language [here](exercise-Rev.html).
 
 Briefly, different types of operators are used to explicitly define different types of variables:
 
-- `<-`: [constant variables](exercise-03.html#constant) - variables that are fixed throughout your analysis, e.g., number of taxa
-- `~`: [stochastic variables](exercise-03.html#stochastic)- variables that are described by or drawn from some underlying distribution; these are estimated during your analysis, e.g., the tree topology or branch lengths
-- `:=`: [deterministic variables](exercise-03.html#deterministic) - variables that can be transformed based on the values of other variables, e.g., total tree length is the sum of all branch lengths
+- `<-`: [constant variables](exercise-Rev.html#constant) - variables that are fixed throughout your analysis, e.g., number of taxa
+- `~`: [stochastic variables](exercise-Rev.html#stochastic)- variables that are described by or drawn from some underlying distribution; these are estimated during your analysis, e.g., the tree topology or branch lengths
+- `:=`: [deterministic variables](exercise-Rev.html#deterministic) - variables that can be transformed based on the values of other variables, e.g., total tree length is the sum of all branch lengths
 - `=`: used to define variables that are not part of the model, e.g., the vector of MCMC moves
 
-We'll see examples of all of these in setting up your analysis. 
+We'll see examples of all of these in setting up our analysis. 
 
 ## Read in the data and define helper variables
 
 Start with your `main.Rev` script. First we need to read in the character matrix.
 
 ```{r data, eval=FALSE}
-data <- readDiscreteCharacterData("data/Agnolin.nex")
-data
+morpho <- readDiscreteCharacterData("data/Egi.nex")
+morpho
 ```
 
 Next we need to define some variables that will come in handy later for setting up our model.
 
 ```{r vars, eval=FALSE}
-num_taxa <- data.ntaxa() # number of taxa
+num_taxa <- morpho.ntaxa() # number of taxa
 num_branches <- 2 * num_taxa - 3 # number of branches in an unrooted tree
-taxa <- data.taxa() # list of taxon names
+taxa <- morpho.taxa() # list of taxon names
 ```
 
 Note these are [constant](exercise-03.html#constant) variables.
@@ -114,12 +114,6 @@ For setting up regular Bayesian tree inference we need to specify two model comp
   2. and we need to specify a character evolution or substitution model
 
 First we'll set up the uniform tree prior in `main.Rev`. The following specifies a uniform prior on the **tree topology** $-$ this means that all possible tree configurations have the *same probability* under the prior. The tree is a [stochastic](exercise-03.html#stochastic) variable.
-
-```{r tree_prior, eval=FALSE, echo=FALSE}
-#TODO this doesn't work
-out_group <- clade("Galeopterus_variegatus") # define the outgroup so we can root the tree, this is the flying lemur
-topology ~ dnUniformTopology(taxa, outgroup = out_group)
-```
 
 ```{r tree_prior2, eval=FALSE}
 topology ~ dnUniformTopology(taxa)
@@ -158,8 +152,8 @@ for (i in 1:num_branches) {
 The tree we're interested in and the one we use to calculate the likelihood combines the topology and branch lengths, which we can define using a  [deterministic](exercise-03.html#deterministic) variable.
 
 ```{r tree, eval=FALSE}
-tree := treeAssembly(topology, br_lens)
-tree
+phylogeny := treeAssembly(topology, br_lens)
+phylogeny
 ```
 
 It might also be interesting to monitor the total tree length. We can do this by defining another deterministic node.
@@ -173,28 +167,28 @@ TL := sum(br_lens)
 Now that we've specified the tree prior, we'll go ahead and set up the character evolution model, using the Lewis Mk model, which makes the same assumptions as the Jukes-Cantor subsitution model used for molecular data.
 Let's do this in a separate file called `Mk.Rev`.
 
-We'll define a **Q matrix** for X states (A, T, G, C) using the `fnJC` function. Under this model rates of change between states and state frequencies (the proportion of each character state) are assumed to be equal. Later we'll see what happens when we relax this assumption.
+We'll define a **Q matrix** for 5 states (0, 1, 2, 3, 4, 5) using the `fnJC` function. Under this model rates of change between states and state frequencies (the proportion of each character state) are assumed to be equal. Later we'll see what happens when we relax this assumption.
 
 ```{r Q, eval=FALSE}
-Q <- fnJC(4) #TODO check
+Q <- fnJC(5)
 Q
 ```
 
 Next we'll define a stochastic node representing a character matrix and "clamp" that variable to our observed character data.
 
 ```{r seq, eval=FALSE}
-seq ~ dnPhyloCTMC(tree = tree, Q = Q, type = "DNA")
-seq.clamp(data)
+seq ~ dnPhyloCTMC(tree = phylogeny, Q = Q, type = "Standard")
+seq.clamp(morpho)
 ```
 
-This basically tells the program to calculate the likelihood for this data using the character evolution model specified using the function arguments (i.e., calculate the likelihood for our tree using the Mk model represented by the Q matrix). We don't need to add any additional moves here because we're not estimating any extra parameters.
+This basically tells the program to calculate the likelihood for this data using the character evolution model specified using the function arguments (i.e., calculate the likelihood for our tree using the Mk model represented by the Q matrix). We don't need to add any additional moves here because we're not estimating any extra parameters. Type refers to the data type, e.g., DNA. "Standard" refers to integers, which includes discrete morphological data.
 
 It might seem a bit overkill to have such a small number of code lines in a separate script but as the models become more complex you'll see why this becomes useful. 
 
 Return to your main script `main.Rev` and add the following line. This tells the program to read and execute the script containing details of the character evolution model.
 
 ```{r source, eval=FALSE}
-source("scripts/JC.Rev")
+source("scripts/Mk.Rev")
 ```
 
 ## MCMC settings
@@ -215,9 +209,9 @@ Next we'll define a set of **monitors** so we can record the output.
 
 ```{r monitors, eval=FALSE}
 # parameters printed to file
-monitors.append( mnModel(filename = "output/primates_JC.log", printgen = 10) )
+monitors.append( mnModel(filename = "output/Mk_Palass_2024.log", printgen = 10) )
 # trees printed to file
-monitors.append( mnFile(filename = "output/primates_JC.trees", printgen = 10, tree) )
+monitors.append( mnFile(filename = "output/Mk_Palass_2024.trees", printgen = 10, phylogeny) )
 # parameter values printed to screen during the MCMC
 monitors.append( mnScreen(printgen = 100, TL) )
 ```
@@ -255,9 +249,9 @@ Explore the output, including the Trace panel at the top.
 There are some indicators that our analyses *haven't* converged, including the ESS values which are highlighted in orange and red, and the trace plots.
 This means we haven't adequately approximated the posterior parameter space. 
 
-Let's increase the chain length to 10000 and rerun the MCMC. This might take up to XXXX minutes $-$. #TODO
+Let's increase the chain length to 20000 and rerun the MCMC. This will take a bit longer to run.
 
-You're already getting a flavour for how long MCMC analyses can take. #TODO It's very common to have to run empirical analyses for millions+ generations and it can take several days for a single analysis.
+You're already getting a flavour for how long MCMC analyses can take. It's very common to have to run empirical analyses for millions+ generations and it can take several days for a single analysis.
 
 Once your longer run is complete, open the file again in Tracer. Your new output should look something like this.
 
@@ -275,12 +269,12 @@ It is important to note the summary tree is not the "true" result $-$ the entire
 
 ```{r MAP, eval=FALSE}
 # read the tree file back in
-treetrace = readTreeTrace("output/primates_JC.trees", treetype = "non-clock")
+treetrace = readTreeTrace("output/Mk_Palass_2024.trees", treetype = "non-clock")
 # generate a MAP tree
-map_tree = mapTree(treetrace, "output/primates_JC_MAP.tree")
+map_tree = mapTree(treetrace, "output/Mk_Palass_2024.tree")
 ```
 
-You can open this tree in FigTree. Root the tree along the branch leading to `"Galeopterus_variegatus` $-$ this is our outgroup, the flying lemur.
+You can open this tree in FigTree. Root the tree along the branch leading to `"missing_ORIG_Procerberus_and_Cimolestes` $-$ this is our outgroup, the flying lemur.
 Next let's look at the node support. Go to Node Labels > Display > posterior.
 Your output should look something like this.
 
@@ -288,6 +282,7 @@ Your output should look something like this.
 knitr::include_graphics("figtree.png")
 ```
 
-> Are there any differences between the summary trees?  TODO
+> How would you interpret the node support values?
 
 A complete set of scripts for this exercise can be downloaded [here](scripts/exercise04-scripts.zip).
+

@@ -30,7 +30,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("slides/01-intro.pdf", "exercise-01-tree-inference.html")
+urls <- c("slides/01-intro.pdf", "tree-inference.html")
 
 dt <- data.frame(links = c("Slides", 
                               "Exercise 1"),

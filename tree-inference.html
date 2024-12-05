@@ -11,9 +11,9 @@
 
 
 
-<title>exercise-01-tree-inference.knit</title>
+<title>tree-inference.knit</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -271,13 +271,13 @@ $(document).ready(function () {
 </p>
 <div id="bayesian-tree-inference-using-revbayes" class="section level1">
 <h1>Bayesian tree inference using RevBayes</h1>
-<p>In this exercise we’ll estimate a tree of terror birds (<a
-href="https://de.wikipedia.org/wiki/Brontornis"><em>Brontornis</em></a>)
-using morphological character data. The matrix is from <a
-href="http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333">Agnolin
-et al. 2007</a> and consists of 12 taxa and 51 characters <span
+<p>In this exercise we’ll estimate a tree of hyaenodonts (<a
+href="https://en.wikipedia.org/wiki/Hyaenodonta">Hyaenodonta</a>) using
+morphological character data. The matrix is from <a
+href="http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333">Egi
+et al. 2007</a> and consists of 12 taxa and 65 characters <span
 class="math inline">\(-\)</span> you can download this <a
-href="data/Agnolin.nex">here</a>.</p>
+href="data/Egi.nex">here</a>.</p>
 <p>We’ll be using a Bayesian approach and a simple model of character
 evolution, the Mk model.</p>
 </div>
@@ -360,38 +360,38 @@ path.</p>
 programming language. One of the main differences is that it includes an
 explicit set of commands and operators for setting up hierarchical or
 graphical models. You can learn more about and explore the Rev language
-<a href="">here</a>.</p>
+<a href="exercise-Rev.html">here</a>.</p>
 <p>Briefly, different types of operators are used to explicitly define
 different types of variables:</p>
 <ul>
-<li><code>&lt;-</code>: <a href="exercise-03.html#constant">constant
+<li><code>&lt;-</code>: <a href="exercise-Rev.html#constant">constant
 variables</a> - variables that are fixed throughout your analysis, e.g.,
 number of taxa</li>
-<li><code>~</code>: <a href="exercise-03.html#stochastic">stochastic
+<li><code>~</code>: <a href="exercise-Rev.html#stochastic">stochastic
 variables</a>- variables that are described by or drawn from some
 underlying distribution; these are estimated during your analysis, e.g.,
 the tree topology or branch lengths</li>
 <li><code>:=</code>: <a
-href="exercise-03.html#deterministic">deterministic variables</a> -
+href="exercise-Rev.html#deterministic">deterministic variables</a> -
 variables that can be transformed based on the values of other
 variables, e.g., total tree length is the sum of all branch lengths</li>
 <li><code>=</code>: used to define variables that are not part of the
 model, e.g., the vector of MCMC moves</li>
 </ul>
-<p>We’ll see examples of all of these in setting up your analysis.</p>
+<p>We’ll see examples of all of these in setting up our analysis.</p>
 </div>
 <div id="read-in-the-data-and-define-helper-variables"
 class="section level2">
 <h2>Read in the data and define helper variables</h2>
 <p>Start with your <code>main.Rev</code> script. First we need to read
 in the character matrix.</p>
-<pre class="r"><code>data &lt;- readDiscreteCharacterData(&quot;data/Agnolin.nex&quot;)
-data</code></pre>
+<pre class="r"><code>morpho &lt;- readDiscreteCharacterData(&quot;data/Egi.nex&quot;)
+morpho</code></pre>
 <p>Next we need to define some variables that will come in handy later
 for setting up our model.</p>
-<pre class="r"><code>num_taxa &lt;- data.ntaxa() # number of taxa
+<pre class="r"><code>num_taxa &lt;- morpho.ntaxa() # number of taxa
 num_branches &lt;- 2 * num_taxa - 3 # number of branches in an unrooted tree
-taxa &lt;- data.taxa() # list of taxon names</code></pre>
+taxa &lt;- morpho.taxa() # list of taxon names</code></pre>
 <p>Note these are <a href="exercise-03.html#constant">constant</a>
 variables.</p>
 <p>Next we’ll define a set of variables for setting up our MCMC. Note
@@ -445,8 +445,8 @@ parameter is a continuous variable that can be any real number value
 likelihood combines the topology and branch lengths, which we can define
 using a <a href="exercise-03.html#deterministic">deterministic</a>
 variable.</p>
-<pre class="r"><code>tree := treeAssembly(topology, br_lens)
-tree</code></pre>
+<pre class="r"><code>phylogeny := treeAssembly(topology, br_lens)
+phylogeny</code></pre>
 <p>It might also be interesting to monitor the total tree length. We can
 do this by defining another deterministic node.</p>
 <pre class="r"><code>TL := sum(br_lens)</code></pre>
@@ -458,29 +458,31 @@ the character evolution model, using the Lewis Mk model, which makes the
 same assumptions as the Jukes-Cantor subsitution model used for
 molecular data. Let’s do this in a separate file called
 <code>Mk.Rev</code>.</p>
-<p>We’ll define a <strong>Q matrix</strong> for X states (A, T, G, C)
-using the <code>fnJC</code> function. Under this model rates of change
-between states and state frequencies (the proportion of each character
-state) are assumed to be equal. Later we’ll see what happens when we
-relax this assumption.</p>
-<pre class="r"><code>Q &lt;- fnJC(4) #TODO check
+<p>We’ll define a <strong>Q matrix</strong> for 5 states (0, 1, 2, 3, 4,
+5) using the <code>fnJC</code> function. Under this model rates of
+change between states and state frequencies (the proportion of each
+character state) are assumed to be equal. Later we’ll see what happens
+when we relax this assumption.</p>
+<pre class="r"><code>Q &lt;- fnJC(5)
 Q</code></pre>
 <p>Next we’ll define a stochastic node representing a character matrix
 and “clamp” that variable to our observed character data.</p>
-<pre class="r"><code>seq ~ dnPhyloCTMC(tree = tree, Q = Q, type = &quot;DNA&quot;)
-seq.clamp(data)</code></pre>
+<pre class="r"><code>seq ~ dnPhyloCTMC(tree = phylogeny, Q = Q, type = &quot;Standard&quot;)
+seq.clamp(morpho)</code></pre>
 <p>This basically tells the program to calculate the likelihood for this
 data using the character evolution model specified using the function
 arguments (i.e., calculate the likelihood for our tree using the Mk
 model represented by the Q matrix). We don’t need to add any additional
-moves here because we’re not estimating any extra parameters.</p>
+moves here because we’re not estimating any extra parameters. Type
+refers to the data type, e.g., DNA. “Standard” refers to integers, which
+includes discrete morphological data.</p>
 <p>It might seem a bit overkill to have such a small number of code
 lines in a separate script but as the models become more complex you’ll
 see why this becomes useful.</p>
 <p>Return to your main script <code>main.Rev</code> and add the
 following line. This tells the program to read and execute the script
 containing details of the character evolution model.</p>
-<pre class="r"><code>source(&quot;scripts/JC.Rev&quot;)</code></pre>
+<pre class="r"><code>source(&quot;scripts/Mk.Rev&quot;)</code></pre>
 </div>
 <div id="mcmc-settings" class="section level2">
 <h2>MCMC settings</h2>
@@ -498,9 +500,9 @@ your model. See if you can work out what they are.</p>
 the output. <code>printgen</code> specifies the frequency with which we
 output or record the parameters during the MCMC run.</p>
 <pre class="r"><code># parameters printed to file
-monitors.append( mnModel(filename = &quot;output/primates_JC.log&quot;, printgen = 10) )
+monitors.append( mnModel(filename = &quot;output/Mk_Palass_2024.log&quot;, printgen = 10) )
 # trees printed to file
-monitors.append( mnFile(filename = &quot;output/primates_JC.trees&quot;, printgen = 10, tree) )
+monitors.append( mnFile(filename = &quot;output/Mk_Palass_2024.trees&quot;, printgen = 10, phylogeny) )
 # parameter values printed to screen during the MCMC
 monitors.append( mnScreen(printgen = 100, TL) )</code></pre>
 <p>Finally, we’ll set up the MCMC run using the <code>mcmc</code>
@@ -536,11 +538,10 @@ reached convergence?</p>
 converged, including the ESS values which are highlighted in orange and
 red, and the trace plots. This means we haven’t adequately approximated
 the posterior parameter space.</p>
-<p>Let’s increase the chain length to 10000 and rerun the MCMC. This
-might take up to XXXX minutes <span class="math inline">\(-\)</span>.
-#TODO</p>
+<p>Let’s increase the chain length to 20000 and rerun the MCMC. This
+will take a bit longer to run.</p>
 <p>You’re already getting a flavour for how long MCMC analyses can take.
-#TODO It’s very common to have to run empirical analyses for millions+
+It’s very common to have to run empirical analyses for millions+
 generations and it can take several days for a single analysis.</p>
 <p>Once your longer run is complete, open the file again in Tracer. Your
 new output should look something like this.</p>
@@ -559,17 +560,17 @@ one way of summarising the posterior distribution of trees.</p>
 <span class="math inline">\(-\)</span> the entire posterior distribution
 (which might contain many different trees) is the full result.</p>
 <pre class="r"><code># read the tree file back in
-treetrace = readTreeTrace(&quot;output/primates_JC.trees&quot;, treetype = &quot;non-clock&quot;)
+treetrace = readTreeTrace(&quot;output/Mk_Palass_2024.trees&quot;, treetype = &quot;non-clock&quot;)
 # generate a MAP tree
-map_tree = mapTree(treetrace, &quot;output/primates_JC_MAP.tree&quot;)</code></pre>
+map_tree = mapTree(treetrace, &quot;output/Mk_Palass_2024.tree&quot;)</code></pre>
 <p>You can open this tree in FigTree. Root the tree along the branch
-leading to <code>"Galeopterus_variegatus</code> <span
+leading to <code>"missing_ORIG_Procerberus_and_Cimolestes</code> <span
 class="math inline">\(-\)</span> this is our outgroup, the flying lemur.
 Next let’s look at the node support. Go to Node Labels &gt; Display &gt;
 posterior. Your output should look something like this.</p>
 <p><img src="figtree.png" width="85%" style="padding:10px" /></p>
 <blockquote>
-<p>Are there any differences between the summary trees? TODO</p>
+<p>How would you interpret the node support values?</p>
 </blockquote>
 <p>A complete set of scripts for this exercise can be downloaded <a
 href="scripts/exercise04-scripts.zip">here</a>.</p>
