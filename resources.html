@@ -11,7 +11,7 @@
 
 
 
-<title>resources.knit</title>
+<title>Additional resources</title>
 
 <script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -29,6 +29,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -219,6 +222,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -226,6 +292,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -263,21 +339,67 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Additional resources</h1>
 
 </div>
 
 
 <p><br />
 </p>
-<div id="resources-will-be-posted-here-before-and-during-workshop"
+<div id="resources-will-be-added-here-before-and-during-workshop"
 class="section level3">
-<h3>Resources will be posted here before and during workshop!</h3>
+<h3>Resources will be added here before and during workshop!</h3>
 <p><br />
 </p>
+</div>
+<div id="papers" class="section level1">
+<h1>Papers</h1>
+<ul>
+<li>Exploring the fit of phylogenetic models to morphological data
+(model adequacy), see <a
+href="https://academic.oup.com/sysbio/advance-article-abstract/doi/10.1093/sysbio/syae055/7814882">Mulvey
+et al. (2024)</a></li>
+<li>Estimating trees or rates, when origination, extinction and sampling
+vary through time (birth-death skyline models), see <a
+href="https://www.cambridge.org/core/journals/cambridge-prisms-extinction/article/mechanistic-phylodynamic-models-do-not-provide-conclusive-evidence-that-nonavian-dinosaurs-were-in-decline-before-their-final-extinction/A4B969E201DF64596175127357991F4B">Allen
+et al. (2024)</a> or <a
+href="https://www.lyellcollection.org/doi/full/10.1144/SP549-2023-174">Allen
+et al. (2025)</a></li>
+<li>Dating super trees using the fossilised birth-death process, see <a
+href="https://bmcecolevol.biomedcentral.com/articles/10.1186/s12862-019-1466-4">Godoy
+et al. (2019)</a>, see also <a
+href="https://www.cambridge.org/core/journals/paleobiology/article/abs/assessing-the-effect-of-timescaling-methods-on-phylogenybased-analyses-in-the-fossil-record/082F239A2512CC09E51181F9B499D1A3">Bapst
+(2016)</a></li>
+<li><em>Practical guidelines for Bayesian phylogenetic inference using
+Markov chain Monte Carlo (MCMC)</em> <a
+href="https://open-research-europe.ec.europa.eu/articles/3-204">Barido-Sottani
+et al. (2024)</a></li>
+</ul>
+</div>
+<div id="software-tutorials" class="section level1">
+<h1>Software tutorials</h1>
+<p>An extended version of the FBD tutorial for total-evidence anylsis
+can be found on the <a
+href="https://taming-the-beast.org/tutorials/FBD-tutorial/">Taming the
+Beast site</a> and the <a
+href="https://revbayes.github.io/tutorials/">RevBayes tutorial
+page</a>.</p>
+</div>
+<div id="simulations" class="section level1">
+<h1>Simulations</h1>
+<p>You can also use simulations to explore assumptions of the FBD
+process (and related birth-process models) using the <a
+href="https://github.com/fossilsim/fossilsim">FossilSim</a> R package
+application <a
+href="https://github.com/fossilsim/FossilSimShiny">FossilSimShiny</a>.
+Associated exercise available <a
+href="https://phylogenetics-fau.netlify.app/fossilsimshiny">here</a>.</p>
 </div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -310,6 +432,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

@@ -32,9 +32,9 @@ If you encounter any installation issues, please get in touch beforehand - descr
 
 ## Recommended reading
 
-- [*Understanding the tripartite approach to Bayesian divergence time estimation*](https://ecoevorxiv.org/repository/view/4372/) Warnock & Wright, 2020
-- [*Total-evidence dating and the fossilized birth–death model*](https://academic.oup.com/sysbio/article/65/2/228/2427164) Gavryushkina & Zhang, 2021
-- [*Assessing the effect of time-scaling methods on phylogeny-based analyses in the fossil record*](https://www.cambridge.org/core/journals/paleobiology/article/assessing-the-effect-of-timescaling-methods-on-phylogenybased-analyses-in-the-fossil-record/082F239A2512CC09E51181F9B499D1A3) Bapst, 2016
+- *Understanding the tripartite approach to Bayesian divergence time estimation* [Warnock & Wright, 2020](https://ecoevorxiv.org/repository/view/4372/)
+- *Total-evidence dating and the fossilized birth–death model* [Gavryushkina & Zhang, 2021](https://academic.oup.com/sysbio/article/65/2/228/2427164)
+- *Assessing the effect of time-scaling methods on phylogeny-based analyses in the fossil record* [Bapst, 2016](https://www.cambridge.org/core/journals/paleobiology/article/assessing-the-effect-of-timescaling-methods-on-phylogenybased-analyses-in-the-fossil-record/082F239A2512CC09E51181F9B499D1A3)
 
 PDFs available here: https://tinyurl.com/ycy9bjka 
 
