@@ -266,7 +266,7 @@ The R script for this section can be downloaded [here](scripts/test-stats.r). To
 
 This script calculates posterior P-values and effect sizes to determine the adequacy of the model. Here we calculate 4 p-values, lower 1-tailed, Upper 1-tailed, 2-tailed, and the mid-point p-value. Values of less than 0.025 or greater the 0.975 indicate significance. The effect sizes can also be used to determine the adequacy of a model, though the p-values are considered more conservative. For the effect sizes, if the maximum and minimum value range through zero a model can be considered adequate.
 
-If can open up the `test-stats.R`file in R studio. You need to make sure that the model you specified is the model you ran the analysis under. You will not need to change anything else in the script to run it. 
+You can open up the `test-stats.R`file in R studio. You need to make sure that the model you specified is the model you ran the analysis under. You will not need to change anything else in the script to run it. 
 
 ```{r test-stats, eval = FALSE}
 model <- "Mk"
