@@ -9,9 +9,11 @@ output:
 
 # Papers
 
-The above exercises are adapted from tutorials written by Tracy Heath, Joëlle Barido-Sottani and co-authors. 
 
 # Tutorials
+
+The above exercises are adapted from tutorials written by Tracy Heath, Joëlle Barido-Sottani and co-authors. 
+
 
 ## Inference
 

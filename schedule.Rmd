@@ -30,7 +30,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("", "")
+urls <- c("slides/01-intro.pdf", "exercise-01-tree-inference.html")
 
 dt <- data.frame(links = c("Slides", 
                               "Exercise 1"),
@@ -38,8 +38,8 @@ dt <- data.frame(links = c("Slides",
                             "Tree inference using RevBayes"
                             ))
 
-#dt$schedule[1] <- paste0("[", dt$schedule[1], "](", urls[1], ")")
-#dt$schedule[2] <- paste0("[", dt$schedule[2], "](", urls[2], ")")
+dt$links[1] <- paste0("[", dt$links[1], "](", urls[1], ")")
+dt$links[2] <- paste0("[", dt$links[2], "](", urls[2], ")")
 
 kbl(dt) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
@@ -59,8 +59,8 @@ dt <- data.frame(links = c("Slides",
                  topics = c("Model adequacy",
                             "Model adequacy in RevBayes"))
 
-#dt$schedule[1] <- paste0("[", dt$schedule[1], "](", urls[1], ")")
-#dt$schedule[2] <- paste0("[", dt$schedule[2], "](", urls[2], ")")
+dt$links[1] <- paste0("[", dt$links[1], "](", urls[1], ")")
+dt$links[2] <- paste0("[", dt$links[2], "](", urls[2], ")")
 
 kbl(dt) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
@@ -82,8 +82,8 @@ dt <- data.frame(links = c("Slides",
                  topics = c("Birth-death sampling process models",
                             "tbd"))
 
-#dt$schedule[1] <- paste0("[", dt$schedule[1], "](", urls[1], ")")
-#dt$schedule[2] <- paste0("[", dt$schedule[2], "](", urls[2], ")")
+dt$links[1] <- paste0("[", dt$links[1], "](", urls[1], ")")
+dt$links[2] <- paste0("[", dt$links[2], "](", urls[2], ")")
 
 kbl(dt) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
