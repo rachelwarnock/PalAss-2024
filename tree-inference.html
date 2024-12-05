@@ -274,7 +274,7 @@ $(document).ready(function () {
 <p>In this exercise we’ll estimate a tree of hyaenodonts (<a
 href="https://en.wikipedia.org/wiki/Hyaenodonta">Hyaenodonta</a>) using
 morphological character data. The matrix is from <a
-href="http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333">Egi
+href="https://www.tandfonline.com/doi/abs/10.1017/S1477201905001707">Egi
 et al. 2007</a> and consists of 12 taxa and 65 characters <span
 class="math inline">\(-\)</span> you can download this <a
 href="data/Egi.nex">here</a>.</p>
@@ -364,18 +364,18 @@ graphical models. You can learn more about and explore the Rev language
 <p>Briefly, different types of operators are used to explicitly define
 different types of variables:</p>
 <ul>
-<li><code>&lt;-</code>: <a href="exercise-Rev.html#constant">constant
-variables</a> - variables that are fixed throughout your analysis, e.g.,
-number of taxa</li>
-<li><code>~</code>: <a href="exercise-Rev.html#stochastic">stochastic
-variables</a>- variables that are described by or drawn from some
-underlying distribution; these are estimated during your analysis, e.g.,
-the tree topology or branch lengths</li>
-<li><code>:=</code>: <a
-href="exercise-Rev.html#deterministic">deterministic variables</a> -
-variables that can be transformed based on the values of other
-variables, e.g., total tree length is the sum of all branch lengths</li>
-<li><code>=</code>: used to define variables that are not part of the
+<li><code>&lt;-</code> is used for <a
+href="exercise-Rev.html#constant">constant variables</a> that are fixed
+throughout your analysis, e.g., number of taxa</li>
+<li><code>~</code> is used for <a
+href="exercise-Rev.html#stochastic">stochastic variables</a> that are
+sampled from some underlying distribution and estimated during your
+analysis, e.g., the tree topology or branch lengths</li>
+<li><code>:=</code> are used for <a
+href="exercise-Rev.html#deterministic">deterministic variables</a> that
+can be transformed based on the values of other variables, e.g., total
+tree length is the sum of all branch lengths</li>
+<li><code>=</code> are used to define variables that are not part of the
 model, e.g., the vector of MCMC moves</li>
 </ul>
 <p>We’ll see examples of all of these in setting up our analysis.</p>

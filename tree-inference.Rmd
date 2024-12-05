@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Bayesian tree inference using RevBayes
 
-In this exercise we'll estimate a tree of hyaenodonts ([Hyaenodonta](https://en.wikipedia.org/wiki/Hyaenodonta)) using morphological character data. The matrix is from [Egi et al.  2007](http://revista.macn.gob.ar/ojs/index.php/RevMus/article/view/349/333) and consists of 12 taxa and 65 characters $-$ you can download this [here](data/Egi.nex).  
+In this exercise we'll estimate a tree of hyaenodonts ([Hyaenodonta](https://en.wikipedia.org/wiki/Hyaenodonta)) using morphological character data. The matrix is from [Egi et al.  2007](https://www.tandfonline.com/doi/abs/10.1017/S1477201905001707) and consists of 12 taxa and 65 characters $-$ you can download this [here](data/Egi.nex).  
 
 We'll be using a Bayesian approach and a simple model of character evolution, the Mk model.
 
@@ -73,10 +73,10 @@ One of the main differences is that it includes an explicit set of commands and 
 
 Briefly, different types of operators are used to explicitly define different types of variables:
 
-- `<-`: [constant variables](exercise-Rev.html#constant) - variables that are fixed throughout your analysis, e.g., number of taxa
-- `~`: [stochastic variables](exercise-Rev.html#stochastic)- variables that are described by or drawn from some underlying distribution; these are estimated during your analysis, e.g., the tree topology or branch lengths
-- `:=`: [deterministic variables](exercise-Rev.html#deterministic) - variables that can be transformed based on the values of other variables, e.g., total tree length is the sum of all branch lengths
-- `=`: used to define variables that are not part of the model, e.g., the vector of MCMC moves
+- `<-` is used for [constant variables](exercise-Rev.html#constant) that are fixed throughout your analysis, e.g., number of taxa
+- `~` is used for [stochastic variables](exercise-Rev.html#stochastic) that are sampled from some underlying distribution and estimated during your analysis, e.g., the tree topology or branch lengths
+- `:=` are used for [deterministic variables](exercise-Rev.html#deterministic) that can be transformed based on the values of other variables, e.g., total tree length is the sum of all branch lengths
+- `=` are used to define variables that are not part of the model, e.g., the vector of MCMC moves
 
 We'll see examples of all of these in setting up our analysis. 
 

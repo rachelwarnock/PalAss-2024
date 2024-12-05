@@ -1,10 +1,5 @@
 ---
 title: ""
-output:
-  html_document:
-    toc: TRUE
-    toc_float: TRUE
-    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 3. Intro to Bayesian time-tree inference (11:00 - 12:00)
 4. Panel discussion (12:00 - 12:30)
 
-# Part 1
+# Bayesian tree inference
 
 ```{r, echo = FALSE}
 library(kableExtra)
@@ -46,7 +41,7 @@ kbl(dt) %>%
 
 ```
 
-# Part 2
+# Model Adequacy
 
 ```{r, echo = FALSE}
 library(kableExtra)
@@ -69,7 +64,7 @@ kbl(dt) %>%
 
 *Short break!!*
 
-# Part 3
+# Birth-death sampling models
 
 ```{r, echo = FALSE}
 library(kableExtra)
