@@ -326,8 +326,8 @@ output of previous models.</p>
 <p>Create vectors for our moves and monitors</p>
 <pre class="r"><code>moves = VectorMoves()
 monitors = VectorMonitors()</code></pre>
-<div id="tree-model" class="section level6">
-<h6>Tree model</h6>
+<div id="tree-model" class="section level5">
+<h5>Tree model</h5>
 <p>Set up the prior for the branch lengths</p>
 <pre class="r"><code>br_len_lambda ~ dnExp(0.2)
 moves.append(mvScale(br_len_lambda, weight=2))</code></pre>

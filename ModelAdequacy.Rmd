@@ -69,7 +69,7 @@ monitors = VectorMonitors()
 ```
 
 
-###### Tree model
+##### Tree model
 Set up the prior for the branch lengths
 ```{r branches, eval=FALSE}
 br_len_lambda ~ dnExp(0.2)
