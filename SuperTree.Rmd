@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ###### Thanks to **David Černý** for his help developing this code.
 
-In paleobiology there are often situations where in we want to date a supertree, or any tree for which we do not have any character data associated with taxa at the tips. This is commonly carried out in MrBayes, though it is also possible to do in RevBayes.The following tutorial provides sample code for dating a super tree of dinosaurs? (need to check this) in Revbayes using the Fossilized Birth death model. 
+In paleobiology there are often situations where we want to date a supertree, or any tree for which we do not have any character data associated with taxa at the tips. This is commonly carried out in MrBayes, though it is also possible to do in RevBayes.The following tutorial provides sample code for dating a super tree of dinosaurs? (need to check this) in Revbayes using the Fossilized Birth death model. 
 The data is from *Tasimov et al. (in prep)* and is of XX taxa with ages ranging from XX to XX.
 
 Note: This tutorial uses both R and RevBayes for steps of the inference. RevBayes is under active development and will eventually provide a approach to carry out the full analysis .... coming soon-ish......
