@@ -64,7 +64,9 @@ Later we'll see how we can run your own scripts using the `source()` command.
 
 ## Windows
 
-Can someone with experience on windows add a blurb here?
+In Windows you can do the same as above using GitBash.
+
+Can someone with experience in windows confirm this for me?
 
 ## The Rev langauge
 
@@ -148,6 +150,8 @@ for (i in 1:num_branches) {
    moves.append( mvScale(br_lens[i]) )
 }
 ```
+
+Using the Rev language we can also put a prior on the mean of the distribution used to specify branch lengths (see next [exercise](ModelAdequacy.html.html) for example).
 
 The tree we're interested in and the one we use to calculate the likelihood combines the topology and branch lengths, which we can define using a  [deterministic](exercise-03.html#deterministic) variable.
 

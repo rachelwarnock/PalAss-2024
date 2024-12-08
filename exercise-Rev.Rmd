@@ -9,120 +9,114 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \
 
-# Tree building using maximum likelihood
+# Introduction to RevBayes and the Rev language
 
-In this exercise we'll estimate trees using maximum likelihood and look at the impact of different substitution models.
+[RevBayes](https://revbayes.github.io) is a flexible program that has been developed for Bayesian phylogenetics.
+It has it's own command line language, similar to the R programming language, that can be used to set up a model in a Bayesian framework. We won't run any analyses in this exercise, we'll just explore the Rev language and look at the syntax used to set up different types of variables. 
 
-For this we'll use the `phangorn` package again and a data set of primates sequences.
-The sequences are a short fragment of the mitochondrial genome. 
-You can download the data from [here](data/primates-data.nex).
+First make sure you can [download](https://revbayes.github.io/download) and install the software.
+Once you have it up and running, see if you can produce any sensible output using the RevBayes terminal. For example, it can be used like a calculator in the same way as R.
 
-As before start by opening the file and converting the data into the right format for  `phangorn`.
-
-```{r data, eval=FALSE}
-# read in the character matrix in ape 
-dat = ape::read.nexus.data(file = "data/primates-data.nex")
-
-# & convert to phanghorn object
-dat = phangorn::phyDat(dat, type = "DNA")
-```
-
-As before we need to generate a starting tree using neighbour joining.
-
-```{r starting, eval=FALSE}
-# create a neighbour joining starting tree
-dm = phangorn::dist.hamming(dat)
-starting_tree = phangorn::NJ(dm)
-```
-
-*Side note: for those interested from last time, for two sequences the [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) is simply the proportion of sites at which they differ. It's therefore one of the simplest ways to approximate evolutionary distances and generate a starting tree. But remember this approach won't account for convergent evolution or homoplasy.*
-
-The `phangorn` function `pml` (pml = phylogenetic maximum likelihood) calculates the likelihood of a tree given the data under a model specified by the user. We'll start with the simplest model of sequence evolution, the Jukes-Cantor (JC) model.
-
-```{r pml, eval=FALSE}
-# calculate the likelihood of the tree given the data
-fitJC = phangorn::pml(starting_tree, data=dat, model = "JC")
-fitJC
-```
-
-> What do you notice about the base frequencies?
-
-Then we'll use the function `optim.pml` to find the tree with the best likelihood score under the Jukes-Cantor model. This function takes the tree and the starting values obtaining using the `pml` function and explores the tree space by switching around the branches. The argument `optNni = TRUE` tells the function to optimize the tree topology (i.e. find the tree with the highest likelihood), as well as the branch lengths and the model parameters. The parameters of the JC model are fixed, so the model parameters won't actually change in this case.
-
-```{r JC, eval=FALSE}
-# estimate the tree using ML
-fitJC_opt = phangorn::optim.pml(fitJC, model = "JC", optNni = TRUE)
-fitJC_opt
-```
-
-As the ML algorithm proceeds it outputs information about the progress. You can see how the likelihood changes as the tree topology and the branch lengths (edge weights) are updated. You should also see that the likelihood is improving, i.e. getting larger.
-
-The function outputs a list with a bunch of values that might be of interest, including the tree.
-
-```{r list, eval=FALSE}
-fitJC_opt$tree
-```
-
-Next we'll do the same with the GTR substitution model. 
-
-```{r GTR, eval=FALSE}
-fitGTR = phangorn::pml(starting_tree, data=dat, model = "GTR")
-fitGTR_opt = phangorn::optim.pml(fitGTR, model = "GTR", optNni = TRUE)
-fitGTR_opt
-```
-
-> What differences do you notice in the output?
-
-Let's look at the trees. Remember that by default trees generated based on a substitution model will be unrooted. First, let's root the tree using the Lemur.
-
-```{r root, eval=FALSE}
-# identify the outgroup
-outgroup = "Lemur"
-
-# root the tree
-JC_tree_rooted = ape::root(fitJC_opt$tree, outgroup = outgroup, resolve.root = TRUE)
-GTR_tree_rooted = ape::root(fitGTR_opt$tree, outgroup = outgroup, resolve.root = TRUE)
-
-# plot the trees
-plot(JC_tree_rooted)
-plot(GTR_tree_rooted)
-```
-
-> Do you notice any differences in the topology or branch lengths? Which one is correct?
-
-Since we have the maximum likelihood estimate under both models, we can use a straightforward model testing to identify the best fitting model. 
-
-```{r model_test, eval=FALSE}
-AIC(fitJC_opt, fitGTR_opt)
-```
-
-> How would you interpret these results? [Hint](https://www.scribbr.com/statistics/akaike-information-criterion/)
-
-Follow the link to learn more about [interpreting AIC scores](aic.html).
-
-## Output a tree from R
-
-To output a tree from R and save it we can use the `ape` function `write.tree`. This outputs the tree in Newick format.
-
-```{r write_tr, eval=FALSE}
-# write to screen
-ape::write.tree(tree)
-```
-
-```{r write_tr2, eval=FALSE}
-# write to file
-ape::write.tree(tree, file = "my-tree.nex")
+```{r calculator, eval=FALSE}
+4 + 10
 ```
 
 ```{r hidden_notes, eval=FALSE, echo=FALSE}
-## Measuring uncertainty in maximum likelihood and parsimony tree building
-## https://cran.r-project.org/web/packages/phangorn/vignettes/Trees.html
-# See the phangorn documentation regarding the max possible likelihood, also output by the ML fxn. 
-#*In case of interest, the [unconstrained likelihood](https://link.springer.com/content/pdf/10.1007/978-1-4614-1743-9_5.pdf) in this case is the maximum possible value of the log-likelihood based in the alignment.*
+#This website was generated using RMarkdown, so the output will look a little different in RevBayes.
+#Graphical models
 ```
 
-## Other resources for buidling trees using maximum likelihood
+## Constant variables {#constant}
 
-`phangorn` is a very useful package but you won't often see published trees generated using this package. There are other more specialized software packages for tree building using maximum likelihood. Some of these feature additional substitution models or have been optimized for the analysis of large data sets. The analysis in this exercise is very fast because our data set has a small number of species and characters (only 150) -- most DNA data sets are *much* larger than this. Two currently alternative likelihood based programs for tree building are  [RAxML](https://cme.h-its.org/exelixis/web/software/raxml/) and [IQTREE](http://www.iqtree.org/).
+Constant variables have a fixed value and are specified using the left arrow `<-` assignment.
 
-A complete script for this exercise can be downloaded [here](scripts/ML_example.R).
+```{r fixed, eval=FALSE}
+a <- 4
+b <- 10
+a + b
+```
+
+Note that in R the `=` and `<-` assignment can almost always be used interchangeably. This is not the case in RevBayes, where `=` can be used to define variables in your environment, but these can't then be used as part of a model. We'll see some examples of when we might use `=` in RevBayes in future weeks.
+
+To clear the value of a variable you can use `clear(a)`.
+
+## Deterministic variables {#deterministic}
+
+Deterministic variables are linked to the value of other variables and specified using the colon-equal `:=` assignment.
+
+```{r determ1, eval=FALSE}
+# specify constant variable "a"
+a <- 4
+# specify deterministic variable "b"
+b := a
+b
+```
+
+```{r determ2, eval=FALSE}
+# now see what happens if you change the value of "a"
+a <- 5
+b
+```
+
+Deterministic variables can also be transformed using any given formula you provide.
+
+```{r determ3, eval=FALSE}
+b := 3 * a
+```
+
+> Explore what happens when you change the value of `a` and experiment with different formulas / operators.
+
+## Stochastic variables {#stochastic}
+
+Stochastic variables are described with respect to some underlying probability distribution and are specified using the tilde `~` assignment. For example, we might want to say that variable `c` is a normally distributed random variable.
+
+```{r stoch, eval=FALSE}
+# specify the mean and standard deviation parameters as constant variables
+a <- 1
+b <- 0.1
+
+# specify a stochastic variable using the normal distribution 
+c ~ dnNormal(a, b)
+c
+```
+
+Any distribution function in Rev always begins with `dn`. You can also bring up help pages using a question mark like we do in R, e.g., `?dnNormal` will bring up help pages for the normal distribution.
+
+You can define stochastic variables in RevBayes using any common statistical distributions (as well as more complex phylogenetic distributions that we'll meet in future weeks). A list of available Rev functions can be found [here](https://revbayes.github.io/documentation/).
+
+>Can you think of any other common distributions and try to set them up in RevBayes?
+
+If you run the above code again, `c` will take on a different random value from the normal distribution. Without more context, it might not seem obvious why we'd want to define a variable in this way. You can think of `c` as a potential parameter with an unknown value that we're interested in estimating. When we go on to set up the full analysis in a later class, you'll see that we can update the value of `c` during our analysis. And because stochastic variables like `c` are linked to an underlying distribution, `c` inherits some of the properties of that distribution. We can call functions related to that distribution by using `.` followed by a function name. For example, `c.probability()` will tell us the probability of observing the current value of `c` given the underlying distribution.
+
+> Redefine your stochastic variable and compare the probability for different values under the same distribution -- do these probabilities make sense to you?
+
+## Functions
+
+A substitution model is defined by an instantaneous rate matrix, where each character transition is associated with a rate of change (e.g., the rate of changing from A to G). We could set this up manually, by specifying an entry for each row/column in a matrix but this is a kerfuffle. Luckily, RevBayes has many inbuilt functions, which begin `fn`, including one for all the most commonly used substitution models.
+
+The simplest substitution model for nucleotide data is the Jukes-Cantor model, which can be specified using the `fnJC` function.
+
+```{r matrix, eval=FALSE}
+# specify a constant matrix variable 
+Q <- fnJC(4) # 4 here refers to the number of states (i.e. ATGC)
+Q
+```
+
+In this model all the substitution rates are equal. If substitution rates vary, we need to estimate this variability from the data and `Q` would become a deterministic variable. We'll see some examples of this later.
+
+Last thing for today - let's compare the Q matrix and the transition probabilities over different intervals of time. We can start by creating a simpler 2-state Q matrix.
+
+```{r matrix2, eval=FALSE}
+# specify a constant matrix variable 
+Q <- fnJC(2)
+Q
+# calculate the transition probabilities after 0.1 units of time
+Q.getTransitionProbabilities(0.1)
+# calculate the transition probabilities after 100 units of time
+Q.getTransitionProbabilities(100) # 100 units
+```
+
+### Further reading
+
+Here's a more [comprehensive intro](https://revbayes.github.io/tutorials/intro/rev) to the Rev language.
+

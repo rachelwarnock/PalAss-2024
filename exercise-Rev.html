@@ -13,7 +13,7 @@
 
 <title>exercise-Rev.knit</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -269,121 +269,137 @@ $(document).ready(function () {
 
 <p><br />
 </p>
-<div id="tree-building-using-maximum-likelihood" class="section level1">
-<h1>Tree building using maximum likelihood</h1>
-<p>In this exercise we’ll estimate trees using maximum likelihood and
-look at the impact of different substitution models.</p>
-<p>For this we’ll use the <code>phangorn</code> package again and a data
-set of primates sequences. The sequences are a short fragment of the
-mitochondrial genome. You can download the data from <a
-href="data/primates-data.nex">here</a>.</p>
-<p>As before start by opening the file and converting the data into the
-right format for <code>phangorn</code>.</p>
-<pre class="r"><code># read in the character matrix in ape 
-dat = ape::read.nexus.data(file = &quot;data/primates-data.nex&quot;)
-
-# &amp; convert to phanghorn object
-dat = phangorn::phyDat(dat, type = &quot;DNA&quot;)</code></pre>
-<p>As before we need to generate a starting tree using neighbour
-joining.</p>
-<pre class="r"><code># create a neighbour joining starting tree
-dm = phangorn::dist.hamming(dat)
-starting_tree = phangorn::NJ(dm)</code></pre>
-<p><em>Side note: for those interested from last time, for two sequences
-the <a href="https://en.wikipedia.org/wiki/Hamming_distance">Hamming
-distance</a> is simply the proportion of sites at which they differ.
-It’s therefore one of the simplest ways to approximate evolutionary
-distances and generate a starting tree. But remember this approach won’t
-account for convergent evolution or homoplasy.</em></p>
-<p>The <code>phangorn</code> function <code>pml</code> (pml =
-phylogenetic maximum likelihood) calculates the likelihood of a tree
-given the data under a model specified by the user. We’ll start with the
-simplest model of sequence evolution, the Jukes-Cantor (JC) model.</p>
-<pre class="r"><code># calculate the likelihood of the tree given the data
-fitJC = phangorn::pml(starting_tree, data=dat, model = &quot;JC&quot;)
-fitJC</code></pre>
-<blockquote>
-<p>What do you notice about the base frequencies?</p>
-</blockquote>
-<p>Then we’ll use the function <code>optim.pml</code> to find the tree
-with the best likelihood score under the Jukes-Cantor model. This
-function takes the tree and the starting values obtaining using the
-<code>pml</code> function and explores the tree space by switching
-around the branches. The argument <code>optNni = TRUE</code> tells the
-function to optimize the tree topology (i.e. find the tree with the
-highest likelihood), as well as the branch lengths and the model
-parameters. The parameters of the JC model are fixed, so the model
-parameters won’t actually change in this case.</p>
-<pre class="r"><code># estimate the tree using ML
-fitJC_opt = phangorn::optim.pml(fitJC, model = &quot;JC&quot;, optNni = TRUE)
-fitJC_opt</code></pre>
-<p>As the ML algorithm proceeds it outputs information about the
-progress. You can see how the likelihood changes as the tree topology
-and the branch lengths (edge weights) are updated. You should also see
-that the likelihood is improving, i.e. getting larger.</p>
-<p>The function outputs a list with a bunch of values that might be of
-interest, including the tree.</p>
-<pre class="r"><code>fitJC_opt$tree</code></pre>
-<p>Next we’ll do the same with the GTR substitution model.</p>
-<pre class="r"><code>fitGTR = phangorn::pml(starting_tree, data=dat, model = &quot;GTR&quot;)
-fitGTR_opt = phangorn::optim.pml(fitGTR, model = &quot;GTR&quot;, optNni = TRUE)
-fitGTR_opt</code></pre>
-<blockquote>
-<p>What differences do you notice in the output?</p>
-</blockquote>
-<p>Let’s look at the trees. Remember that by default trees generated
-based on a substitution model will be unrooted. First, let’s root the
-tree using the Lemur.</p>
-<pre class="r"><code># identify the outgroup
-outgroup = &quot;Lemur&quot;
-
-# root the tree
-JC_tree_rooted = ape::root(fitJC_opt$tree, outgroup = outgroup, resolve.root = TRUE)
-GTR_tree_rooted = ape::root(fitGTR_opt$tree, outgroup = outgroup, resolve.root = TRUE)
-
-# plot the trees
-plot(JC_tree_rooted)
-plot(GTR_tree_rooted)</code></pre>
-<blockquote>
-<p>Do you notice any differences in the topology or branch lengths?
-Which one is correct?</p>
-</blockquote>
-<p>Since we have the maximum likelihood estimate under both models, we
-can use a straightforward model testing to identify the best fitting
-model.</p>
-<pre class="r"><code>AIC(fitJC_opt, fitGTR_opt)</code></pre>
-<blockquote>
-<p>How would you interpret these results? <a
-href="https://www.scribbr.com/statistics/akaike-information-criterion/">Hint</a></p>
-</blockquote>
-<p>Follow the link to learn more about <a href="aic.html">interpreting
-AIC scores</a>.</p>
-<div id="output-a-tree-from-r" class="section level2">
-<h2>Output a tree from R</h2>
-<p>To output a tree from R and save it we can use the <code>ape</code>
-function <code>write.tree</code>. This outputs the tree in Newick
-format.</p>
-<pre class="r"><code># write to screen
-ape::write.tree(tree)</code></pre>
-<pre class="r"><code># write to file
-ape::write.tree(tree, file = &quot;my-tree.nex&quot;)</code></pre>
+<div id="introduction-to-revbayes-and-the-rev-language"
+class="section level1">
+<h1>Introduction to RevBayes and the Rev language</h1>
+<p><a href="https://revbayes.github.io">RevBayes</a> is a flexible
+program that has been developed for Bayesian phylogenetics. It has it’s
+own command line language, similar to the R programming language, that
+can be used to set up a model in a Bayesian framework. We won’t run any
+analyses in this exercise, we’ll just explore the Rev language and look
+at the syntax used to set up different types of variables.</p>
+<p>First make sure you can <a
+href="https://revbayes.github.io/download">download</a> and install the
+software. Once you have it up and running, see if you can produce any
+sensible output using the RevBayes terminal. For example, it can be used
+like a calculator in the same way as R.</p>
+<pre class="r"><code>4 + 10</code></pre>
+<div id="constant" class="section level2">
+<h2>Constant variables</h2>
+<p>Constant variables have a fixed value and are specified using the
+left arrow <code>&lt;-</code> assignment.</p>
+<pre class="r"><code>a &lt;- 4
+b &lt;- 10
+a + b</code></pre>
+<p>Note that in R the <code>=</code> and <code>&lt;-</code> assignment
+can almost always be used interchangeably. This is not the case in
+RevBayes, where <code>=</code> can be used to define variables in your
+environment, but these can’t then be used as part of a model. We’ll see
+some examples of when we might use <code>=</code> in RevBayes in future
+weeks.</p>
+<p>To clear the value of a variable you can use
+<code>clear(a)</code>.</p>
 </div>
-<div id="other-resources-for-buidling-trees-using-maximum-likelihood"
-class="section level2">
-<h2>Other resources for buidling trees using maximum likelihood</h2>
-<p><code>phangorn</code> is a very useful package but you won’t often
-see published trees generated using this package. There are other more
-specialized software packages for tree building using maximum
-likelihood. Some of these feature additional substitution models or have
-been optimized for the analysis of large data sets. The analysis in this
-exercise is very fast because our data set has a small number of species
-and characters (only 150) – most DNA data sets are <em>much</em> larger
-than this. Two currently alternative likelihood based programs for tree
-building are <a
-href="https://cme.h-its.org/exelixis/web/software/raxml/">RAxML</a> and
-<a href="http://www.iqtree.org/">IQTREE</a>.</p>
-<p>A complete script for this exercise can be downloaded <a
-href="scripts/ML_example.R">here</a>.</p>
+<div id="deterministic" class="section level2">
+<h2>Deterministic variables</h2>
+<p>Deterministic variables are linked to the value of other variables
+and specified using the colon-equal <code>:=</code> assignment.</p>
+<pre class="r"><code># specify constant variable &quot;a&quot;
+a &lt;- 4
+# specify deterministic variable &quot;b&quot;
+b := a
+b</code></pre>
+<pre class="r"><code># now see what happens if you change the value of &quot;a&quot;
+a &lt;- 5
+b</code></pre>
+<p>Deterministic variables can also be transformed using any given
+formula you provide.</p>
+<pre class="r"><code>b := 3 * a</code></pre>
+<blockquote>
+<p>Explore what happens when you change the value of <code>a</code> and
+experiment with different formulas / operators.</p>
+</blockquote>
+</div>
+<div id="stochastic" class="section level2">
+<h2>Stochastic variables</h2>
+<p>Stochastic variables are described with respect to some underlying
+probability distribution and are specified using the tilde
+<code>~</code> assignment. For example, we might want to say that
+variable <code>c</code> is a normally distributed random variable.</p>
+<pre class="r"><code># specify the mean and standard deviation parameters as constant variables
+a &lt;- 1
+b &lt;- 0.1
+
+# specify a stochastic variable using the normal distribution 
+c ~ dnNormal(a, b)
+c</code></pre>
+<p>Any distribution function in Rev always begins with <code>dn</code>.
+You can also bring up help pages using a question mark like we do in R,
+e.g., <code>?dnNormal</code> will bring up help pages for the normal
+distribution.</p>
+<p>You can define stochastic variables in RevBayes using any common
+statistical distributions (as well as more complex phylogenetic
+distributions that we’ll meet in future weeks). A list of available Rev
+functions can be found <a
+href="https://revbayes.github.io/documentation/">here</a>.</p>
+<blockquote>
+<p>Can you think of any other common distributions and try to set them
+up in RevBayes?</p>
+</blockquote>
+<p>If you run the above code again, <code>c</code> will take on a
+different random value from the normal distribution. Without more
+context, it might not seem obvious why we’d want to define a variable in
+this way. You can think of <code>c</code> as a potential parameter with
+an unknown value that we’re interested in estimating. When we go on to
+set up the full analysis in a later class, you’ll see that we can update
+the value of <code>c</code> during our analysis. And because stochastic
+variables like <code>c</code> are linked to an underlying distribution,
+<code>c</code> inherits some of the properties of that distribution. We
+can call functions related to that distribution by using <code>.</code>
+followed by a function name. For example, <code>c.probability()</code>
+will tell us the probability of observing the current value of
+<code>c</code> given the underlying distribution.</p>
+<blockquote>
+<p>Redefine your stochastic variable and compare the probability for
+different values under the same distribution – do these probabilities
+make sense to you?</p>
+</blockquote>
+</div>
+<div id="functions" class="section level2">
+<h2>Functions</h2>
+<p>A substitution model is defined by an instantaneous rate matrix,
+where each character transition is associated with a rate of change
+(e.g., the rate of changing from A to G). We could set this up manually,
+by specifying an entry for each row/column in a matrix but this is a
+kerfuffle. Luckily, RevBayes has many inbuilt functions, which begin
+<code>fn</code>, including one for all the most commonly used
+substitution models.</p>
+<p>The simplest substitution model for nucleotide data is the
+Jukes-Cantor model, which can be specified using the <code>fnJC</code>
+function.</p>
+<pre class="r"><code># specify a constant matrix variable 
+Q &lt;- fnJC(4) # 4 here refers to the number of states (i.e. ATGC)
+Q</code></pre>
+<p>In this model all the substitution rates are equal. If substitution
+rates vary, we need to estimate this variability from the data and
+<code>Q</code> would become a deterministic variable. We’ll see some
+examples of this later.</p>
+<p>Last thing for today - let’s compare the Q matrix and the transition
+probabilities over different intervals of time. We can start by creating
+a simpler 2-state Q matrix.</p>
+<pre class="r"><code># specify a constant matrix variable 
+Q &lt;- fnJC(2)
+Q
+# calculate the transition probabilities after 0.1 units of time
+Q.getTransitionProbabilities(0.1)
+# calculate the transition probabilities after 100 units of time
+Q.getTransitionProbabilities(100) # 100 units</code></pre>
+<div id="further-reading" class="section level3">
+<h3>Further reading</h3>
+<p>Here’s a more <a
+href="https://revbayes.github.io/tutorials/intro/rev">comprehensive
+intro</a> to the Rev language.</p>
+</div>
 </div>
 </div>
 

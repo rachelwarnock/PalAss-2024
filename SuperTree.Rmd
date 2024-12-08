@@ -62,7 +62,7 @@ Binary_tree <- resolveRandom(phy)
 
 Using the function `timePaleoPhy` in the PaleoTree package we can estimate branch length with units of time for our trees (the original tree and the fully resolved, or binary, tree). The `type` variable here refers to the time scaling appraoch used. We are using "mbl" which ensures that there are no zero branch lengths, which is a common result when using the "basic" method. 
 
-````{r paleoTree, eval=FALSE}
+```{r paleoTree, eval=FALSE}
 tt_polytomy <- paleotree::timePaleoPhy(tree = phy, timeData = dinoRanges, type = "mbl", randres = FALSE,
                                        ntrees = 1, plot= T, vartime = 2)
 

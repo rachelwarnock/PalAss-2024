@@ -13,7 +13,7 @@
 
 <title>tree-inference.knit</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -352,7 +352,8 @@ path.</p>
 </div>
 <div id="windows" class="section level2">
 <h2>Windows</h2>
-<p>Can someone with experience on windows add a blurb here?</p>
+<p>In Windows you can do the same as above using GitBash.</p>
+<p>Can someone with experience in windows confirm this for me?</p>
 </div>
 <div id="the-rev-langauge" class="section level2">
 <h2>The Rev langauge</h2>
@@ -438,9 +439,12 @@ exponential prior distribution, along with an appropriate move. This
 parameter is a continuous variable that can be any real number value
 &gt;0, so we’ll use a so-called scale move.</p>
 <pre class="r"><code>for (i in 1:num_branches) {
-   br_lens[i] ~ dnExponential(10.0)
+   br_lens[i] ~ dnExponential(10.0) # mean of this distribution 10
    moves.append( mvScale(br_lens[i]) )
 }</code></pre>
+<p>Using the Rev language we can also put a prior on the mean of the
+distribution used to specify branch lengths (see next <a
+href="ModelAdequacy.html.html">exercise</a> for example).</p>
 <p>The tree we’re interested in and the one we use to calculate the
 likelihood combines the topology and branch lengths, which we can define
 using a <a href="exercise-03.html#deterministic">deterministic</a>
