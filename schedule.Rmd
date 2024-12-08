@@ -70,15 +70,16 @@ kbl(dt) %>%
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("", "")
+urls <- c("", "", "SuperTree.html")
 
 dt <- data.frame(links = c("Slides", 
-                              "Exercise 3"),
+                              "Exercise 3", "Bonus Exercise"),
                  topics = c("Birth-death sampling process models",
-                            "tbd"))
+                            "tbd", "Dating a super tree"))
 
 dt$links[1] <- paste0("[", dt$links[1], "](", urls[1], ")")
 dt$links[2] <- paste0("[", dt$links[2], "](", urls[2], ")")
+dt$links[3] <- paste0("[", dt$links[3], "](", urls[3], ")")
 
 kbl(dt) %>%
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")

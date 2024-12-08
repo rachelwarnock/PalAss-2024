@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>SuperTree.knit</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="schedule.html">Schedule</a>
+</li>
+<li>
+  <a href="resources.html">Resources</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<p><br />
+</p>
+<div id="dating-a-super-tree-using-the-fbd-model"
+class="section level1">
+<h1>Dating a Super Tree using the FBD model</h1>
+<div id="thanks-to-david-černý-for-his-help-developing-this-code."
+class="section level6">
+<h6>Thanks to <strong>David Černý</strong> for his help developing this
+code.</h6>
+<p>In paleobiology there are often situations where we want to date a
+supertree, or any tree for which we do not have any character data
+associated with taxa at the tips. This is commonly carried out in
+MrBayes, though it is also possible to do in RevBayes.The following
+tutorial provides sample code for dating a super tree of dinosaurs?
+(need to check this) in Revbayes using the Fossilized Birth death model.
+The data is from <em>Tasimov et al. (in prep)</em> and is of XX taxa
+with ages ranging from XX to XX.</p>
+<p>Note: This tutorial uses both R and RevBayes for steps of the
+inference. RevBayes is under active development and will eventually
+provide a approach to carry out the full analysis …. coming
+soon-ish……</p>
+</div>
+<div id="organise-you-code" class="section level2">
+<h2>Organise you code</h2>
+<p>As with any analysis it is important to set up you directories
+correctly. You should have a scripts and a data folder. The trees and
+fossils ages can be downloaded <a href="data/dino_data.zip">here</a></p>
+</div>
+<div id="time-scaling-the-tree-in-r" class="section level2">
+<h2>1. Time-scaling the tree in R</h2>
+<p>For this inference Revbayes requires a time-scaled tree as the input.
+We can carry out this time-scaling in R studios. The exact method of
+time scaling used here <em>should not</em> have an impact on the over
+all inference results. We can use the R package <code>paleotree</code>
+to do this. Additionally, if your tree has polytomies we need to provide
+RevBayes with a fully resolved tree as the initial tree and the original
+tree is then supplied as the so called backbone tree. In this way the
+polytomies can be resolved by leveraging the temporal information during
+the FBD analysis.</p>
+<p>We first need to read in our age data and create a matrix of ages
+required for the time scaling method</p>
+<pre class="r"><code>taxa_ages &lt;- read.table(&quot;data/ages.csv&quot;, header = T)
+rownames(unique_taxa_ages) &lt;- unique_taxa_ages[,1]
+dinoRanges &lt;- unique_taxa_ages[,2:3]</code></pre>
+<p>We can read in our tree</p>
+<pre class="r"><code>phy &lt;- ape::read.tree(&quot;data/dino.tree&quot;)</code></pre>
+<p>We then borrow a function from Liam Revell’s <a
+href="http://blog.phytools.org/2017/06/generating-set-of-random-resolutions-of.html">website</a>
+for randomly resolving polytomies</p>
+<pre class="r"><code>resolveRandom&lt;-function(tree){
+  while(!is.binary(tree)){
+    nodes&lt;-1:tree$Nnode+Ntip(tree)
+    Nchildren&lt;-function(node,tree) length(Children(tree,node))
+    nchilds&lt;-sapply(nodes,Nchildren,tree=tree)
+    node&lt;-nodes[which(nchilds&gt;2)[1]]
+    tree&lt;-sample(resolveNode(tree,node),1)[[1]]
+  }
+  tree
+}
+
+
+Binary_tree &lt;- resolveRandom(phy)</code></pre>
+<p>Using the function <code>timePaleoPhy</code> in the PaleoTree package
+we can estimate branch length with units of time for our trees (the
+original tree and the fully resolved, or binary, tree). The
+<code>type</code> variable here refers to the time scaling appraoch
+used. We are using “mbl” which ensures that there are no zero branch
+lengths, which is a common result when using the “basic” method.</p>
+<pre class="r"><code>tt_polytomy &lt;- paleotree::timePaleoPhy(tree = phy, timeData = dinoRanges, type = &quot;mbl&quot;, randres = FALSE,
+                                       ntrees = 1, plot= T, vartime = 2)
+
+
+tt_binary &lt;-  paleotree::timePaleoPhy(tree = Binary_tree, timeData = dinoRanges, type = &quot;mbl&quot;, randres = FALSE,
+                                      ntrees = 1, plot = T, vartime = 2)</code></pre>
+<p>Now we can write the trees to file to use them for our FBD
+inference</p>
+<pre class="r"><code>write.tree(tt_polytomy,&quot;data/dated_backbone.tre&quot;)
+write.tree(tt_binary,&quot;data/dated_initial.tre&quot;)</code></pre>
+</div>
+<div id="fbd-inference-in-revbayes" class="section level2">
+<h2>2. FBD inference in RevBayes</h2>
+<p>Below I will provide the code for estimating divergence times of a
+super tree using the FBD model. It is important to note that this code
+works by <strong>fixing the fossil ages</strong>. This has been shown to
+be problematic, see <a
+href="https://www.frontiersin.org/journals/ecology-and-evolution/articles/10.3389/fevo.2020.00183/full">Barido-Sottani
+et al 2020</a>, however is currently the only practical implementation.
+The new release of RevBayes will allow you to estimate these ages, so
+keep an eye out for that!</p>
+<p>As with any analysis it is helpful to give it a name</p>
+<pre class="r"><code>analysis_name = &quot;Palss_2024&quot;</code></pre>
+<p>We can then read in our age information</p>
+<pre class="r"><code>### read in the age infromation 
+taxa &lt;- readTaxonData(&quot;data/ages.csv&quot;)</code></pre>
+<p>Read in our backbone tree (i.e., our original tree with
+polytomies)</p>
+<pre class="r"><code>## read in the backbone tree - the one with ploytomies 
+bb &lt;- readTrees(&quot;data/datedbackbone.tre&quot;)[1]</code></pre>
+<p>As there is no explicit information in our newick string about the
+age of the tree we need to offet it by the age of the youngest
+fossil</p>
+<pre class="r"><code>## offset the ages by the age of the youngest tip
+bb.offset(98)</code></pre>
+<p>We can do the exact same for the starting tree</p>
+<pre class="r"><code>init &lt;- readTrees(&quot;data/dated_initial.tre&quot;)[1]
+init.offset(98)</code></pre>
+<p>We can then set the priors on our FBD paramters: speciation,
+extinction, and sampling</p>
+<pre class="r"><code>speciation_rate ~ dnExponential(10)
+extinction_rate ~ dnExponential(10)
+
+moves.append( mvScale(speciation_rate, lambda=0.01, weight=1) )
+moves.append( mvScale(speciation_rate, lambda=0.1,  weight=1) )
+moves.append( mvScale(speciation_rate, lambda=1.0,  weight=1) )
+
+moves.append( mvScale(extinction_rate, lambda=0.01, weight=1) )
+moves.append( mvScale(extinction_rate, lambda=0.1,  weight=1) )
+moves.append( mvScale(extinction_rate, lambda=1,    weight=1) )
+
+
+psi ~ dnExponential(10)
+moves.append( mvScale(psi, lambda=0.01, weight=1) )
+moves.append( mvScale(psi, lambda=0.1,  weight=1) )
+moves.append( mvScale(psi, lambda=1,    weight=1) )</code></pre>
+<p>We can keep track of parameters of interest during the analysis</p>
+<pre class="r"><code>diversification := speciation_rate - extinction_rate
+turnover := extinction_rate/speciation_rate</code></pre>
+<p>As our tree is fully extinct we can set rho, the probability of
+extant species sampling, to zero</p>
+<pre class="r"><code>rho &lt;- 0</code></pre>
+<p>The root age is set using a uniform prior on the start of the
+Triassic and the oldest fossil</p>
+<pre class="r"><code>root_age ~ dnUniform(170.9, 251)
+moves.append( mvSlide(root_age, delta=0.1, weight=5) )</code></pre>
+<p>Having defined all our parameters we can create our FBD object</p>
+<pre class="r"><code>fbd_dist = dnFBDP(rootAge=root_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho,taxa=taxa)</code></pre>
+<p>The FBD tree is constrained using both of the time trees</p>
+<pre class="r"><code>fbd_tree ~ dnConstrainedTopology(fbd_dist, backbone=bb, initialTree=init)
+
+moves.append( mvFNPR(fbd_tree, weight=15.0) )
+moves.append( mvCollapseExpandFossilBranch(fbd_tree, root_age, weight=6.0) )
+moves.append( mvNodeTimeSlideUniform(fbd_tree, weight=40.0) )</code></pre>
+<p>Record the number of sampled ancestors</p>
+<pre class="r"><code>num_samp_anc := fbd_tree.numSampledAncestors()</code></pre>
+<p>Define our model</p>
+<pre class="r"><code>mymodel = model(fbd_tree)</code></pre>
+<p>Define some monitors</p>
+<pre class="r"><code># 1. for the full model #
+monitors.append( mnModel(filename=&quot;output/&quot; + analysis_name + &quot;_dino.log&quot;, printgen=10, exclude = [&quot;F&quot;]) )
+
+# 2. the tree #
+monitors.append( mnFile(filename=&quot;output/&quot; + analysis_name + &quot;_dino.trees&quot;, printgen=10, fbd_tree) )
+
+# 3. and a few select parameters to be printed to the screen #
+monitors.append( mnScreen(printgen=1000, root_age) )</code></pre>
+<p>Finally, initialise and run our inference</p>
+<pre class="r"><code># Initialize the MCMC object #
+mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine=&quot;mixed&quot;)
+
+
+mymcmc = mcmc(mymodel, monitors, moves)
+mymcmc.run(generations=10000)</code></pre>
+<p>Create a summary tree</p>
+<pre class="r"><code>trace = readTreeTrace(&quot;output/&quot; + analysis_name + &quot;_dino.trees&quot;)
+mccTree(trace,&quot;output/&quot; + analysis_name + &quot;_dino_mcc.tre&quot;, positiveBranchLengths = TRUE)</code></pre>
+<p>Note: this will not converge! The chain needs to be run for a lot
+longer, but that is ok for the purposes of this tutorial.</p>
+</div>
+<div id="tree-visualization-in-r" class="section level2">
+<h2>3. Tree visualization in R</h2>
+<p>We can plot our time tree in R using the R package
+<code>RevGadgets</code>. This R package provides lots of cool ways for
+processing the output of a phylogentic inference in RevBayes, for more
+information <a
+href="https://revbayes.github.io/tutorials/intro/revgadgets.html">see</a></p>
+<pre class="r"><code>library(RevGadgets)
+file &lt;- &quot;output/Palss_2024_dino_mcc.tre&quot;
+FBD_tree &lt;- RevGadgets::readTrees(paths = file)</code></pre>
+<p>As before we need to include our offset, so we add 98 to the
+posterior of tree</p>
+<pre class="r"><code>FBD_tree[[1]][[1]]@data[[&quot;age_0.95_HPD&quot;]]&lt;- 
+  lapply(FBD_tree[[1]][[1]]@data[[&quot;age_0.95_HPD&quot;]], function(x) x + 98)</code></pre>
+<p>Create our plot</p>
+<pre class="r"><code>p &lt;- plotFBDTree(tree = FBD_tree, 
+            timeline = T, 
+            geo_units = &quot;epochs&quot;,
+            tip_labels_italics = T,
+            tip_labels_remove_underscore = T,
+            tip_labels_size = 1, 
+            tip_age_bars = T,
+            node_age_bars = T,
+            age_bars_color = &quot;blue&quot;,
+            label_sampled_ancs = TRUE,
+            line_width = 0.5,
+            age_bars_width = 0.5)</code></pre>
+<p>Add our offset to the tree object and plot</p>
+<pre class="r"><code>p$data$x &lt;- p$data$x - 98
+p</code></pre>
+<p>You should end up with a tree like this:</p>
+<p><img src="dino.png" width="50%" style="padding:5px" /></p>
+<p>You can play with the plotting function to make this tree look nicer!
+Download the complete scripts for this tutorial <a
+href="scripts/dino.zip">here</a></p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
