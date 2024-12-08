@@ -144,7 +144,7 @@ Next we need to specify a prior on the **branch lengths**. We'll do this using a
 
 ```{r br_lengths, eval=FALSE}
 for (i in 1:num_branches) {
-   br_lens[i] ~ dnExponential(10.0)
+   br_lens[i] ~ dnExponential(10.0) # mean of this distribution 10
    moves.append( mvScale(br_lens[i]) )
 }
 ```
