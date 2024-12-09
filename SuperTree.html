@@ -13,7 +13,7 @@
 
 <title>SuperTree.knit</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -482,20 +482,20 @@ href="scripts/dino.zip">here</a></p>
 <p>We can relax the assumption of constant speciation, extinction, and
 fossil sampling in an FBD analysis by using a skyline model. This model
 allows rates to vary in a piece-wise manner across different geological
-intervals. Essentially, creating time-bins as in common in many
+intervals. Essentially, creating time-bins as in common with many
 paleontological methods. To do this you need to define your timeline and
 create a vector of your rates for each bin.</p>
 <p>We can edit the existing FBD.rev file as as follows (copy the FBD.rev
-file and rename).</p>
-<p>Upate the name of the analyis</p>
+file and rename it).</p>
+<p>Update the name of the analysis.</p>
 <pre class="r"><code>analysis_name = &quot;Palss_2024_skyline&quot;</code></pre>
 <p>Define the time line specifying the intervals. We will set four time
 bins here, representing the middle Jurassic, Late Jurassic, Early
 Cretaceous, and Late Cretaceous.</p>
 <pre class="r"><code>timeline  &lt;- v(100.5, 145, 163.5)</code></pre>
-<p>You can remove how we defined speciation, extintion and fossil
-sampling from this new skyline. We can then loop through the different
-time bins to estimate rates for each of them.</p>
+<p>You can remove how we defined speciation, extinction and fossil
+sampling from this new skyline analysis. We can then loop through the
+different time bins to estimate rates for each of them.</p>
 <pre class="r"><code>alpha &lt;- 10
 
 for(i in 1:(timeline.size()+1))
@@ -520,12 +520,12 @@ for(i in 1:(timeline.size()+1))
     moves.append( mvScale(psi[i], lambda = 1) )
 }</code></pre>
 <p>Our FBD model then uses a vector of values for these rates</p>
-<pre class="r"><code>fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho, taxa=taxa, timeline = timeline)</code></pre>
+<pre class="r"><code>fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho, taxa=taxa, timeline=timeline)</code></pre>
 <blockquote>
 <p>Nothing else in the script needs to be changed for this analysis.
-Here we have all three parameters varying however we could choose to fix
-on for example fossil sampling, and then just allows speciation and
-extinction to vary though time.</p>
+Here we have all three parameters varying, however, we could choose to
+fix one, for example fossil sampling, and then just allows speciation
+and extinction to vary though time.</p>
 </blockquote>
 </div>
 </div>

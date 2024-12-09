@@ -284,11 +284,12 @@ You can play with the plotting function to make this tree look nicer! Download t
 
 
 ## 4. Skyline FBD 
-We can relax the assumption of constant speciation, extinction, and fossil sampling in an FBD analysis by using a skyline model. This model allows rates to vary in a piece-wise manner across different geological intervals. Essentially, creating time-bins as in common in many paleontological methods. To do this you need to define your timeline and create a vector of your rates for each bin. 
+We can relax the assumption of constant speciation, extinction, and fossil sampling in an FBD analysis by using a skyline model. This model allows rates to vary in a piece-wise manner across different geological intervals. Essentially, creating time-bins as in common with many paleontological methods. To do this you need to define your timeline and create a vector of your rates for each bin. 
 
-We can edit the existing FBD.rev file as as follows (copy the FBD.rev file and rename).
+We can edit the existing FBD.rev file as as follows (copy the FBD.rev file and rename it).
 
-Upate the name of the analyis 
+Update the name of the analysis.
+
 ```{r skyline, eval = FALSE}
 analysis_name = "Palss_2024_skyline"
 
@@ -302,7 +303,7 @@ Define the time line specifying the intervals. We will set four time bins here, 
 timeline  <- v(100.5, 145, 163.5)
 ```
 
-You can remove how we defined speciation, extintion and fossil sampling from this new skyline. We can then loop through the different time bins to estimate rates for each of them. 
+You can remove how we defined speciation, extinction and fossil sampling from this new skyline analysis. We can then loop through the different time bins to estimate rates for each of them. 
 
 ```{r skyrates, eval= FALSE}
 
@@ -337,10 +338,10 @@ for(i in 1:(timeline.size()+1))
 
 Our FBD model then uses a vector of values for these rates 
 ```{r fbdsky, eval=FALSE}
-fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho, taxa=taxa, timeline = timeline)
+fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho, taxa=taxa, timeline=timeline)
 ```
 
->Nothing else in the script needs to be changed for this analysis. Here we have all three parameters varying however we could choose to fix on for example fossil sampling, and then just allows speciation and extinction to vary though time.
+>Nothing else in the script needs to be changed for this analysis. Here we have all three parameters varying, however, we could choose to fix one, for example fossil sampling, and then just allows speciation and extinction to vary though time.
 
 
 
