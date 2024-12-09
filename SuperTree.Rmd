@@ -31,8 +31,6 @@ Load relevant r packages
 
 ```{r packages, eval= FALSE}
 library(paleotree)
-library(RRphylo)
-library(dplyr)
 library(phytools)
 library(phangorn)
 library(ape)
