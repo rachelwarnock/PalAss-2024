@@ -13,7 +13,7 @@
 
 <title>SuperTree.knit</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -282,12 +282,11 @@ associated with taxa at the tips. This is commonly carried out in
 MrBayes, though it is also possible to do in RevBayes.The following
 tutorial provides sample code for dating a super tree of dinosaurs?
 (need to check this) in Revbayes using the Fossilized Birth death model.
-The data is from <em>Tasimov et al. (in prep)</em> and is of XX taxa
-with ages ranging from XX to XX.</p>
+The data is from <em>Tasimov et al. (in prep)</em> and is of 66 taxa
+with ages ranging from Middle Jurassic to Late Cretaceous.</p>
 <p>Note: This tutorial uses both R and RevBayes for steps of the
 inference. RevBayes is under active development and will eventually
-provide a approach to carry out the full analysis …. coming
-soon-ish……</p>
+provide a approach to carry out the full analysis. Coming soon-ish……</p>
 </div>
 <div id="organise-you-code" class="section level2">
 <h2>Organise you code</h2>
@@ -306,11 +305,18 @@ RevBayes with a fully resolved tree as the initial tree and the original
 tree is then supplied as the so called backbone tree. In this way the
 polytomies can be resolved by leveraging the temporal information during
 the FBD analysis.</p>
+<p>Load relevant r packages</p>
+<pre class="r"><code>library(paleotree)
+library(RRphylo)
+library(dplyr)
+library(phytools)
+library(phangorn)
+library(ape)</code></pre>
 <p>We first need to read in our age data and create a matrix of ages
 required for the time scaling method</p>
 <pre class="r"><code>taxa_ages &lt;- read.table(&quot;data/ages.csv&quot;, header = T)
-rownames(unique_taxa_ages) &lt;- unique_taxa_ages[,1]
-dinoRanges &lt;- unique_taxa_ages[,2:3]</code></pre>
+rownames(utaxa_ages) &lt;- taxa_ages[,1]
+dinoRanges &lt;- taxa_ages[,2:3]</code></pre>
 <p>We can read in our tree</p>
 <pre class="r"><code>phy &lt;- ape::read.tree(&quot;data/dino.tree&quot;)</code></pre>
 <p>We then borrow a function from Liam Revell’s <a
@@ -397,17 +403,17 @@ turnover := extinction_rate/speciation_rate</code></pre>
 <p>As our tree is fully extinct we can set rho, the probability of
 extant species sampling, to zero</p>
 <pre class="r"><code>rho &lt;- 0</code></pre>
-<p>The root age is set using a uniform prior on the start of the
+<p>The origin age is set using a uniform prior on the start of the
 Triassic and the oldest fossil</p>
-<pre class="r"><code>root_age ~ dnUniform(170.9, 251)
-moves.append( mvSlide(root_age, delta=0.1, weight=5) )</code></pre>
+<pre class="r"><code>origin_age ~ dnUniform(170.9, 251)
+moves.append( mvSlide(origin_age, delta=0.1, weight=5) )</code></pre>
 <p>Having defined all our parameters we can create our FBD object</p>
-<pre class="r"><code>fbd_dist = dnFBDP(rootAge=root_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho,taxa=taxa)</code></pre>
+<pre class="r"><code>fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho,taxa=taxa)</code></pre>
 <p>The FBD tree is constrained using both of the time trees</p>
 <pre class="r"><code>fbd_tree ~ dnConstrainedTopology(fbd_dist, backbone=bb, initialTree=init)
 
 moves.append( mvFNPR(fbd_tree, weight=15.0) )
-moves.append( mvCollapseExpandFossilBranch(fbd_tree, root_age, weight=6.0) )
+moves.append( mvCollapseExpandFossilBranch(fbd_tree, origin_age, weight=6.0) )
 moves.append( mvNodeTimeSlideUniform(fbd_tree, weight=40.0) )</code></pre>
 <p>Record the number of sampled ancestors</p>
 <pre class="r"><code>num_samp_anc := fbd_tree.numSampledAncestors()</code></pre>
@@ -421,7 +427,7 @@ monitors.append( mnModel(filename=&quot;output/&quot; + analysis_name + &quot;_d
 monitors.append( mnFile(filename=&quot;output/&quot; + analysis_name + &quot;_dino.trees&quot;, printgen=10, fbd_tree) )
 
 # 3. and a few select parameters to be printed to the screen #
-monitors.append( mnScreen(printgen=1000, root_age) )</code></pre>
+monitors.append( mnScreen(printgen=1000, origin_age) )</code></pre>
 <p>Finally, initialise and run our inference</p>
 <pre class="r"><code># Initialize the MCMC object #
 mymcmc = mcmc(mymodel, monitors, moves, nruns=2, combine=&quot;mixed&quot;)
@@ -470,6 +476,57 @@ p</code></pre>
 <p>You can play with the plotting function to make this tree look nicer!
 Download the complete scripts for this tutorial <a
 href="scripts/dino.zip">here</a></p>
+</div>
+<div id="skyline-fbd" class="section level2">
+<h2>4. Skyline FBD</h2>
+<p>We can relax the assumption of constant speciation, extinction, and
+fossil sampling in an FBD analysis by using a skyline model. This model
+allows rates to vary in a piece-wise manner across different geological
+intervals. Essentially, creating time-bins as in common in many
+paleontological methods. To do this you need to define your timeline and
+create a vector of your rates for each bin.</p>
+<p>We can edit the existing FBD.rev file as as follows (copy the FBD.rev
+file and rename).</p>
+<p>Upate the name of the analyis</p>
+<pre class="r"><code>analysis_name = &quot;Palss_2024_skyline&quot;</code></pre>
+<p>Define the time line specifying the intervals. We will set four time
+bins here, representing the middle Jurassic, Late Jurassic, Early
+Cretaceous, and Late Cretaceous.</p>
+<pre class="r"><code>timeline  &lt;- v(100.5, 145, 163.5)</code></pre>
+<p>You can remove how we defined speciation, extintion and fossil
+sampling from this new skyline. We can then loop through the different
+time bins to estimate rates for each of them.</p>
+<pre class="r"><code>alpha &lt;- 10
+
+for(i in 1:(timeline.size()+1))
+{
+    extinction_rate[i] ~ dnExp(alpha)
+    speciation_rate[i] ~ dnExp(alpha)
+    psi[i] ~ dnExp(alpha)
+
+    diversification[i] := speciation_rate[i] -  extinction_rate[i]
+    turnover[i] :=  extinction_rate[i]/speciation_rate[i]
+
+    moves.append( mvScale(extinction_rate[i], lambda = 0.01) )
+    moves.append( mvScale(extinction_rate[i], lambda = 0.1) )
+    moves.append( mvScale(extinction_rate[i], lambda = 1) )
+
+    moves.append( mvScale(speciation_rate[i], lambda = 0.01) )
+    moves.append( mvScale(speciation_rate[i], lambda = 0.1) )
+    moves.append( mvScale(speciation_rate[i], lambda = 1) )
+
+    moves.append( mvScale(psi[i], lambda = 0.01) )
+    moves.append( mvScale(psi[i], lambda = 0.1) )
+    moves.append( mvScale(psi[i], lambda = 1) )
+}</code></pre>
+<p>Our FBD model then uses a vector of values for these rates</p>
+<pre class="r"><code>fbd_dist = dnFBDP(originAge=origin_age, lambda=speciation_rate, mu=extinction_rate, psi=psi, rho=rho, taxa=taxa, timeline = timeline)</code></pre>
+<blockquote>
+<p>Nothing else in the script needs to be changed for this analysis.
+Here we have all three parameters varying however we could choose to fix
+on for example fossil sampling, and then just allows speciation and
+extinction to vary though time.</p>
+</blockquote>
 </div>
 </div>
 

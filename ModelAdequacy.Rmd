@@ -72,7 +72,7 @@ monitors = VectorMonitors()
 ##### Tree model
 Set up the prior for the branch lengths
 ```{r branches, eval=FALSE}
-br_len_lambda ~ dnExp(0.2)
+br_len_lambda ~ dnExp(0.1).  ## this has a mean of 10 
 moves.append(mvScale(br_len_lambda, weight=2))
 ```
 
@@ -123,7 +123,7 @@ seq.clamp(morpho)
 ```
 
 ##### Mk+G: 
-To estimate ACRV*we first need to set up a prior on our alpha (or shape) parameter
+To estimate ACRV we first need to set up a prior on our alpha (or shape) parameter
 
 ```{r mkv, eval=FALSE}
 ## define our Q matrix

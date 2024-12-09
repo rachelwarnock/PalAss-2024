@@ -13,7 +13,7 @@
 
 <title>ModelAdequacy.knit</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -329,7 +329,7 @@ monitors = VectorMonitors()</code></pre>
 <div id="tree-model" class="section level5">
 <h5>Tree model</h5>
 <p>Set up the prior for the branch lengths</p>
-<pre class="r"><code>br_len_lambda ~ dnExp(0.2)
+<pre class="r"><code>br_len_lambda ~ dnExp(0.1).  ## this has a mean of 10 
 moves.append(mvScale(br_len_lambda, weight=2))</code></pre>
 <p>We then set a uniform tree prior for the tree topology. This prior
 assumes that no tree is more likely <em>a priori</em> than any
@@ -384,7 +384,7 @@ seq.clamp(morpho)</code></pre>
 </div>
 <div id="mkg" class="section level5">
 <h5>Mk+G:</h5>
-<p>To estimate ACRV*we first need to set up a prior on our alpha (or
+<p>To estimate ACRV we first need to set up a prior on our alpha (or
 shape) parameter</p>
 <pre class="r"><code>## define our Q matrix
 Q &lt;- fnJC(5)
