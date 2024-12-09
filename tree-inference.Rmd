@@ -288,5 +288,5 @@ knitr::include_graphics("figtree.png")
 
 > How would you interpret the node support values?
 
-A complete set of scripts for this exercise can be downloaded [here](scripts/exercise04-scripts.zip).
+A complete set of scripts for this exercise can be downloaded [here](scritree-inference.zip).
 
