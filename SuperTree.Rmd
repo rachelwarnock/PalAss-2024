@@ -109,7 +109,7 @@ taxa <- readTaxonData("data/ages.csv")
 Read in our backbone tree (i.e., our original tree with polytomies)
 ```{r back, eval=FALSE}
 ## read in the backbone tree - the one with ploytomies 
-bb <- readTrees("data/datedbackbone.tre")[1]
+bb <- readTrees("data/dated_backbone.tre")[1]
 ```
 
 As there is no explicit information in our newick string about the age of the tree we need to offet it by the age of the youngest fossil
@@ -127,6 +127,12 @@ init <- readTrees("data/dated_initial.tre")[1]
 init.offset(98)
 ```
 
+We initialize vectors for our moves and monitors
+
+```{r moves, eval=FALSE}
+moves = VectorMoves()
+monitors = VectorMonitors()
+```
 
 We can then set the priors on our FBD paramters: speciation, extinction, and sampling
 

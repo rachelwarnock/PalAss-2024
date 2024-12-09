@@ -13,7 +13,7 @@
 
 <title>SuperTree.knit</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -368,7 +368,7 @@ taxa &lt;- readTaxonData(&quot;data/ages.csv&quot;)</code></pre>
 <p>Read in our backbone tree (i.e., our original tree with
 polytomies)</p>
 <pre class="r"><code>## read in the backbone tree - the one with ploytomies 
-bb &lt;- readTrees(&quot;data/datedbackbone.tre&quot;)[1]</code></pre>
+bb &lt;- readTrees(&quot;data/dated_backbone.tre&quot;)[1]</code></pre>
 <p>As there is no explicit information in our newick string about the
 age of the tree we need to offet it by the age of the youngest
 fossil</p>
@@ -377,6 +377,9 @@ bb.offset(98)</code></pre>
 <p>We can do the exact same for the starting tree</p>
 <pre class="r"><code>init &lt;- readTrees(&quot;data/dated_initial.tre&quot;)[1]
 init.offset(98)</code></pre>
+<p>We initialize vectors for our moves and monitors</p>
+<pre class="r"><code>moves = VectorMoves()
+monitors = VectorMonitors()</code></pre>
 <p>We can then set the priors on our FBD paramters: speciation,
 extinction, and sampling</p>
 <pre class="r"><code>speciation_rate ~ dnExponential(10)
