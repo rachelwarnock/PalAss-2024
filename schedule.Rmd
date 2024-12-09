@@ -46,7 +46,7 @@ kbl(dt) %>%
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("", "ModelAdequacy.html")
+urls <- c("slides/PalAss-workshop-part2.pdf", "ModelAdequacy.html")
 
 dt <- data.frame(links = c("Slides", 
                               "Exercise 2"),
@@ -69,7 +69,7 @@ kbl(dt) %>%
 library(kableExtra)
 
 #urls <- c("slides/01-intro.pdf","exercise-01.html")
-urls <- c("", "SuperTree.html")
+urls <- c("slides/PalAss-workshop-part3.pdf", "SuperTree.html")
 
 dt <- data.frame(links = c("Slides", 
                               "Exercise 3"),
