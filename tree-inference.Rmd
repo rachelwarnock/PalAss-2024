@@ -199,10 +199,10 @@ source("scripts/Mk.Rev")
 
 Before we run the analysis we just need to finish setting up the MCMC.
 
-Add the following line to create the variable `mymodel`. This is a special variable that gets passed to the MCMC functions. We can actually do this using any variable in our hierarchical model, I've just arbitrarily used `tree` here. 
+Add the following line to create the variable `mymodel`. This is a special variable that gets passed to the MCMC functions. We can actually do this using any variable in our hierarchical model, I've just arbitrarily used `phylogeny` here. 
 
 ```{r model, eval=FALSE}
-mymodel = model(tree)
+mymodel = model(phylogeny)
 mymodel
 ```
 
@@ -278,7 +278,7 @@ treetrace = readTreeTrace("output/Mk_Palass_2024.trees", treetype = "non-clock")
 map_tree = mapTree(treetrace, "output/Mk_Palass_2024.tree")
 ```
 
-You can open this tree in FigTree. Root the tree along the branch leading to `"missing_ORIG_Procerberus_and_Cimolestes` $-$ this is our outgroup, the flying lemur.
+You can open this tree in FigTree. Root the tree along the branch leading to `"missing_ORIG_Procerberus_and_Cimolestes` $-$ this is our outgroup, a group of small early mammals called cimolestids.
 Next let's look at the node support. Go to Node Labels > Display > posterior.
 Your output should look something like this.
 

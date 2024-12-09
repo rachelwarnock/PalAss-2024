@@ -13,7 +13,7 @@
 
 <title>tree-inference.knit</title>
 
-<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -495,8 +495,8 @@ MCMC.</p>
 <p>Add the following line to create the variable <code>mymodel</code>.
 This is a special variable that gets passed to the MCMC functions. We
 can actually do this using any variable in our hierarchical model, I’ve
-just arbitrarily used <code>tree</code> here.</p>
-<pre class="r"><code>mymodel = model(tree)
+just arbitrarily used <code>phylogeny</code> here.</p>
+<pre class="r"><code>mymodel = model(phylogeny)
 mymodel</code></pre>
 <p>If you look at the output you’ll see a list of all the parameters in
 your model. See if you can work out what they are.</p>
@@ -569,9 +569,10 @@ treetrace = readTreeTrace(&quot;output/Mk_Palass_2024.trees&quot;, treetype = &q
 map_tree = mapTree(treetrace, &quot;output/Mk_Palass_2024.tree&quot;)</code></pre>
 <p>You can open this tree in FigTree. Root the tree along the branch
 leading to <code>"missing_ORIG_Procerberus_and_Cimolestes</code> <span
-class="math inline">\(-\)</span> this is our outgroup, the flying lemur.
-Next let’s look at the node support. Go to Node Labels &gt; Display &gt;
-posterior. Your output should look something like this.</p>
+class="math inline">\(-\)</span> this is our outgroup, a group of small
+early mammals called cimolestids. Next let’s look at the node support.
+Go to Node Labels &gt; Display &gt; posterior. Your output should look
+something like this.</p>
 <p><img src="figtree.png" width="85%" style="padding:10px" /></p>
 <blockquote>
 <p>How would you interpret the node support values?</p>
